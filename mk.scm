@@ -1,7 +1,69 @@
 (define s->S (lambda (s) (car s)))
+(define s->C (lambda (s) (cadr s)))
 (define S->s (lambda (S) (with-S empty-s S)))
-(define with-S (lambda (s S) (list S)))
-(define empty-s '(()))
+(define with-S (lambda (s S) (list S (s->C s))))
+(define empty-s '(() ()))
+
+(define empty-set '#())
+(define empty-set? (lambda (x) (and (vector? x) (= (vector-length x) 0))))
+(define non-empty-set? (lambda (x) (and (vector? x) (> (vector-length x) 1))))
+(define set? (lambda (x) (and (empty-set? x) (non-empty-set? x))))
+(define join
+  (lambda (a b)
+    (cond
+      ((null? a) b)
+      ((member (car a) b) (join (cdr a) b))
+      (else (cons (car a) (join (cdr a) b))))))
+(define normalize-set
+  (lambda (x es s)
+    (cond
+      ((empty-set? x) (if (null? es) empty-set `#(,empty-set ,@es)))
+      ((non-empty-set? x) (let ((v (vector->list x)))
+                            (normalize-set
+                              (walk (car v) s)
+                              (join (cdr v) es)
+                              s)))
+      ((and (var? x) (not (null? es))) `#(,x ,@es))
+      ((and (symbol? x) (not (null? es))) `#(,x ,@es)))))
+(define set-tail
+  (lambda (x)
+    (cond
+      ((empty-set? x) #f)
+      ((non-empty-set? x) (vector-ref x 0))
+      ((var? x) t))))
+(define with-set-tail
+  (lambda (t x)
+    (cond
+      ((non-empty-set? x)
+       (let ((v (vector->list x)))
+         `#(,t ,@(cdr v))))
+      ((var? x) t))))
+(define non-empty-set-first
+  (lambda (x)
+    (vector-ref x 1)))
+(define non-empty-set-rest
+  (lambda (x)
+    (if (= 2 (vector-length x))
+      (vector-ref x 0)
+      (let ((v (vector->list x)))
+        `#(,(car v) ,@(cddr v))))))
+(define (rem-index i lst)
+  (if (= i 0)
+    (cdr lst)
+    (cons (car lst) (rem-index (- i 1) (cdr lst)))))
+(define non-empty-set-at
+  (lambda (j x)
+    (vector-ref x (+ j 1))))
+(define non-empty-set-except-at
+  (lambda (j x)
+    (let ((r (rem-index (+ 1 j) (vector->list x))))
+      (if (null? (cdr r))
+        (car r)
+        `#(,@r)))))
+(define non-empty-set-size
+  (lambda (x)
+    (- (vector-length x) 1)))
+(define setc (lambda (x) succeed)) ;; TODO
 
 (define-syntax lambdag@
   (syntax-rules ()
@@ -33,7 +95,7 @@
 
 (define-syntax var?
   (syntax-rules ()
-    ((_ x) (vector? x))))
+    ((_ x) (and (vector? x) (= (vector-length x) 1)))))
 
 (define walk
   (lambda (u s)
@@ -47,13 +109,56 @@
     (with-S s (cons `(,x . ,v) (s->S s)))))
 
 (define unify
-  (lambda (u v s)
-    (let ((u (walk u s))
-          (v (walk v s)))
+  (lambda (ou ov s)
+    (let ((u (walk ou s))
+          (v (walk ov s)))
       (cond
+        ((and (var? v) (not (var? u))) (unify ov ou s))
         ((eq? u v) s)
-        ((var? u) (ext-s-check u v s))
-        ((var? v) (ext-s-check v u s))
+        ((and (var? u) (not (occurs-check u v s))) (ext-s u v s))
+        ((non-empty-set? v)
+          (let* ((vns (normalize-set v '() s))
+                 (x (set-tail vns)))
+            (cond
+              ((and (var? u) (eq? x u))
+               ((fresh (n)
+                  (== u (with-set-tail n vns))
+                  (setc n))
+                 s))
+              ((non-empty-set? u)
+               (let ((uns (normalize-set u '() s)))
+                 (if (not (eq? (set-tail uns) (set-tail vns)))
+                   (let ((tu (non-empty-set-first uns))
+                         (ru (non-empty-set-rest uns))
+                         (tv (non-empty-set-first vns))
+                         (rv (non-empty-set-rest vns)))
+                     ((conde
+                        ((== tu tv) (== ru rv))
+                        ((== tu tv) (== uns rv))
+                        ((== tu tv) (== ru vns))
+                        ((fresh (n)
+                           (== ru `#(,n ,tv))
+                           (== rv `#(,n ,tu))
+                           (setc n))))
+                       s))
+                   ((let ((t0 (non-empty-set-first uns))
+                          (ru (non-empty-set-rest uns))
+                          (maxj (non-empty-set-size vns)))
+                      (let loopj ((j 0))
+                        (if (< j maxj)
+                          (let ((tj (non-empty-set-at j vns))
+                                (rj (non-empty-set-except-at j vns)))
+                            (conde
+                              ((== t0 tj) (== ru rj))
+                              ((== t0 tj) (== uns rj))
+                              ((== t0 tj) (== ru vns))
+                              ((fresh (n)
+                                 (== x `#(,n ,t0))
+                                 (== (with-set-tail n ru) (with-set-tail n vns))
+                                 (setc n)))
+                              ((loopj (+ j 1)))))
+                          fail))) s))))
+              (else (fail s)))))
         ((and (pair? u) (pair? v))
          (let ((s (unify
                     (car u) (car v) s)))
@@ -77,6 +182,8 @@
          (or
            (occurs-check x (car v) s)
            (occurs-check x (cdr v) s)))
+        ((non-empty-set? v)
+          (occurs-check x (vector->list v) s))
         (else #f)))))
 
 (define walk*
@@ -88,6 +195,9 @@
          (cons
            (walk* (car v) s)
            (walk* (cdr v) s)))
+        ((non-empty-set? v)
+          (let ((ns (normalize-set v '()  s)))
+            `#(,@(walk* (vector->list ns) s))))
         (else v)))))
 
 (define reify-s
@@ -98,6 +208,8 @@
          (ext-s v (reify-name (size-S s)) s))
         ((pair? v) (reify-s (cdr v)
                      (reify-s (car v) s)))
+        ((non-empty-set? v)
+         (reify-s (vector->list v) s))
         (else s)))))
 
 (define reify-name
