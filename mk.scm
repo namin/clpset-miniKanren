@@ -48,7 +48,7 @@
     (cond
       ((null? a) b)
       ((member (car a) b) (join (cdr a) b))
-      (else (cons (car a) (join (cdr a) b))))))
+      (else (join (cdr a) (cons (car a) b))))))
 (define normalize-set
   (lambda (x es s)
     (cond
@@ -56,7 +56,7 @@
       ((non-empty-set? x) (let ((v (vector->list x)))
                             (normalize-set
                               (walk (car v) s)
-                              (join (cdr v) es)
+                              (join (reverse (cdr v)) es)
                               s)))
       ((and (var? x) (not (null? es))) `#(,x ,@es))
       ((and (symbol? x) (not (null? es))) `#(,x ,@es)))))
@@ -347,7 +347,11 @@
       (cond
         ((and (var? v) (not (var? u))) (unify ov ou s))
         ((eq? u v) s)
-        ((and (var? u) (not (occurs-check u v s))) (ext-s u v s))
+        ((and (var? u) (not (occurs-check u v s)))
+          (let ((s (ext-s u v s)))
+            (if (set? v)
+              ((setc u) s)
+              s)))
         ((non-empty-set? v)
           (let* ((vns (normalize-set v '() s))
                  (x (set-tail vns)))
@@ -365,7 +369,7 @@
                          (tv (non-empty-set-first vns))
                          (rv (non-empty-set-rest vns)))
                      ((conde
-                        ((== tu tv) (== ru rv))
+                        ((== tu tv) (== ru rv) (setc ru))
                         ((== tu tv) (== uns rv))
                         ((== tu tv) (== ru vns))
                         ((fresh (n)
@@ -381,7 +385,7 @@
                           (let ((tj (non-empty-set-at j vns))
                                 (rj (non-empty-set-except-at j vns)))
                             (conde
-                              ((== t0 tj) (== ru rj))
+                              ((== t0 tj) (== ru rj) (setc ru))
                               ((== t0 tj) (== uns rj))
                               ((== t0 tj) (== ru vns))
                               ((fresh (n)
