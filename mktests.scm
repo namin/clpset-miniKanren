@@ -58,7 +58,7 @@
 (define max-ticks 10)
 ;;; Will sez:  Uncomment the following line to properly test divergent code.
 ;;; (define max-ticks 10000000)
-  
+
 
 (define-syntax run1 (syntax-rules () ((_ (x) g0 g ...) (run 1 (x) g0 g ...))))
 (define-syntax run2 (syntax-rules () ((_ (x) g0 g ...) (run 2 (x) g0 g ...))))
@@ -104,78 +104,78 @@
 (define-syntax run39 (syntax-rules () ((_ (x) g0 g ...) (run 39 (x) g0 g ...))))
 (define-syntax run40 (syntax-rules () ((_ (x) g0 g ...) (run 40 (x) g0 g ...))))
 
-(test-check "testc11.tex-1" 
+(test-check "testc11.tex-1"
 (run* (q)
   fail)
 
 `())
 
-(test-check "testc11.tex-2"   
+(test-check "testc11.tex-2"
 (run* (q)
   (== #t q))
 
 `(#t))
 
-(test-check "testc11.tex-3"   
-(run* (q) 
+(test-check "testc11.tex-3"
+(run* (q)
   fail
   (== #t q))
 
 `())
 
     (define g fail)
-  
 
-(test-check "testc11.tex-4"   
-(run* (q) 
-  succeed 
+
+(test-check "testc11.tex-4"
+(run* (q)
+  succeed
   (== #t q))
 
 (list #t))
 
-(test-check "testc11.tex-5"   
-(run* (q) 
-  succeed 
+(test-check "testc11.tex-5"
+(run* (q)
+  succeed
   (== #t q))
 
 `(#t))
 
-(test-check "testc11.tex-6"   
-(run* (r) 
+(test-check "testc11.tex-6"
+(run* (r)
   succeed
   (== 'corn r))
 
 (list 'corn))
 
-(test-check "testc11.tex-7"   
-(run* (r) 
+(test-check "testc11.tex-7"
+(run* (r)
   succeed
   (== 'corn r))
 
 `(corn))
 
-(test-check "testc11.tex-8"   
+(test-check "testc11.tex-8"
 (run* (r)
   fail
   (== 'corn r))
 
 `())
 
-(test-check "testc11.tex-9"   
-(run* (q) 
-  succeed 
+(test-check "testc11.tex-9"
+(run* (q)
+  succeed
   (== #f q))
 
 `(#f))
 
-(test-check "testc11.tex-10" 
+(test-check "testc11.tex-10"
 (run* (x)
   (let ((x #f))
     (== #t x)))
 
 '())
 
-(test-check "testc11.tex-11" 
+(test-check "testc11.tex-11"
 (run* (q)
   (fresh (x)
     (== #t x)
@@ -189,7 +189,7 @@
     (== #t q)))
 
 
-(test-check "testc11.tex-12" 
+(test-check "testc11.tex-12"
 (run* (q)
   (fresh (x)
     (== x #t)
@@ -197,7 +197,7 @@
 
 (list #t))
 
-(test-check "testc11.tex-13" 
+(test-check "testc11.tex-13"
 (run* (q)
   (fresh (x)
     (== x #t)
@@ -205,13 +205,13 @@
 
 (list #t))
 
-(test-check "testc11.tex-14"   
+(test-check "testc11.tex-14"
 (run* (x)
   succeed)
 
 (list `_.0))
 
-(test-check "testc11.tex-15"   
+(test-check "testc11.tex-15"
 (run* (x)
   (let ((x #f))
     (fresh (x)
@@ -219,21 +219,21 @@
 
 `(_.0))
 
-(test-check "testc11.tex-16" 
+(test-check "testc11.tex-16"
 (run* (r)
   (fresh (x y)
     (== (cons x (cons y '())) r)))
 
 (list `(_.0 _.1)))
 
-(test-check "testc11.tex-17" 
+(test-check "testc11.tex-17"
 (run* (s)
   (fresh (t u)
     (== (cons t (cons u '())) s)))
 
 (list `(_.0 _.1)))
 
-(test-check "testc11.tex-18" 
+(test-check "testc11.tex-18"
 (run* (r)
   (fresh (x)
     (let ((y x))
@@ -242,7 +242,7 @@
 
 (list `(_.0 _.1 _.0)))
 
-(test-check "testc11.tex-19" 
+(test-check "testc11.tex-19"
 (run* (r)
   (fresh (x)
     (let ((y x))
@@ -251,35 +251,35 @@
 
 (list `(_.0 _.1 _.0)))
 
-(test-check "testc11.tex-20" 
-(run* (q) 
+(test-check "testc11.tex-20"
+(run* (q)
   (== #f q)
   (== #t q))
 
 `())
 
-(test-check "testc11.tex-21"   
-(run* (q) 
+(test-check "testc11.tex-21"
+(run* (q)
   (== #f q)
   (== #f q))
 
 '(#f))
 
-(test-check "testc11.tex-22" 
+(test-check "testc11.tex-22"
 (run* (q)
   (let ((x q))
     (== #t x)))
 
 (list #t))
 
-(test-check "testc11.tex-23" 
+(test-check "testc11.tex-23"
 (run* (r)
   (fresh (x)
     (== x r)))
 
 (list `_.0))
 
-(test-check "testc11.tex-24" 
+(test-check "testc11.tex-24"
 (run* (q)
   (fresh (x)
     (== #t x)
@@ -287,7 +287,7 @@
 
 (list #t))
 
-(test-check "testc11.tex-25" 
+(test-check "testc11.tex-25"
 (run* (q)
   (fresh (x)
     (== x q)
@@ -301,16 +301,16 @@
     (== x q)))
 
 
-(test-check "testc11.tex-26" 
+(test-check "testc11.tex-26"
 (run* (q)
   (fresh (x)
     (== (eq? x q) q)))
 
 
     (list #f))
-  
 
-(test-check "testc11.tex-27" 
+
+(test-check "testc11.tex-27"
 (run* (q)
   (let ((x q))
     (fresh (q)
@@ -318,35 +318,35 @@
 
 (list #f))
 
-(test-check "testc11.tex-28" 
+(test-check "testc11.tex-28"
 (cond
   (#f #t)
   (#t #f))
 
 #f)
 
-(test-check "testc11.tex-29" 
+(test-check "testc11.tex-29"
 (cond
   (#f succeed)
   (#t fail))
 
 
     fail)
-  
+
 
     (test-check "testc13.tex-fail1" (run* (q)
-  
 
-(conde 
-  (fail succeed) 
-  (succeed fail)) 
+
+(conde
+  (fail succeed)
+  (succeed fail))
 
 
     ) '())
-  
+
 
     (test-check "testc13.tex-succeed1" (not (null? (run* (q)
-  
+
 
 (conde
   (fail fail)
@@ -354,10 +354,10 @@
 
 
     ))) #t)
-  
+
 
     (test-check "testc13.tex-succeed2" (not (null? (run* (q)
-  
+
 
 (conde
   (succeed succeed)
@@ -365,9 +365,9 @@
 
 
     ))) #t)
-  
 
-(test-check "testc11.tex-30" 
+
+(test-check "testc11.tex-30"
 (run* (x)
   (conde
     ((== 'olive x) succeed)
@@ -375,7 +375,7 @@
 
 `(olive oil))
 
-(test-check "testc11.tex-31" 
+(test-check "testc11.tex-31"
 (run1 (x)
   (conde
     ((== 'olive x) succeed)
@@ -383,7 +383,7 @@
 
 `(olive))
 
-(test-check "testc11.tex-32" 
+(test-check "testc11.tex-32"
 (run* (x)
   (conde
     ((== 'virgin x) fail)
@@ -394,7 +394,7 @@
 `(olive _.0 oil))
 
     (test-check "testc13.tex-conde1" (run* (x)
-  
+
 
 (conde
   ((== 'olive x) succeed)
@@ -403,9 +403,9 @@
 
 
     ) `(olive _.0 oil))
-  
 
-(test-check "testc11.tex-33" 
+
+(test-check "testc11.tex-33"
 (run2 (x)
   (conde
     ((== 'extra x) succeed)
@@ -415,7 +415,7 @@
 
 `(extra olive))
 
-(test-check "testc11.tex-34" 
+(test-check "testc11.tex-34"
 (run* (r)
   (fresh (x y)
     (== 'split x)
@@ -424,7 +424,7 @@
 
 (list `(split pea)))
 
-(test-check "testc11.tex-35" 
+(test-check "testc11.tex-35"
 (run* (r)
   (fresh (x y)
     (conde
@@ -434,7 +434,7 @@
 
 `((split pea) (navy bean)))
 
-(test-check "testc11.tex-36" 
+(test-check "testc11.tex-36"
 (run* (r)
   (fresh (x y)
     (conde
@@ -451,13 +451,13 @@
       ((== 'cup x) succeed))))
 
 
-(test-check "testc11.tex-37"   
+(test-check "testc11.tex-37"
 (run* (x)
   (teacupo x))
 
 `(tea cup))
 
-(test-check "testc11.tex-38"   
+(test-check "testc11.tex-38"
 (run* (r)
   (fresh (x y)
     (conde
@@ -467,28 +467,28 @@
 
 `((#f #t) (tea #t) (cup #t)))
 
-(test-check "testc11.tex-39"   
-(run* (r)                                                                      
-  (fresh (x y z)                                                              
-    (conde                                                                    
-      ((== y x) (fresh (x) (== z x)))                                         
-      ((fresh (x) (== y x)) (== z x)))                                        
+(test-check "testc11.tex-39"
+(run* (r)
+  (fresh (x y z)
+    (conde
+      ((== y x) (fresh (x) (== z x)))
+      ((fresh (x) (== y x)) (== z x)))
     (== (cons y (cons z '())) r)))
 
 `((_.0 _.1) (_.0 _.1)))
 
-(test-check "testc11.tex-40"   
-(run* (r)                                                                      
-  (fresh (x y z)                                                              
-    (conde                                                                    
-      ((== y x) (fresh (x) (== z x)))                                         
+(test-check "testc11.tex-40"
+(run* (r)
+  (fresh (x y z)
+    (conde
+      ((== y x) (fresh (x) (== z x)))
       ((fresh (x) (== y x)) (== z x)))
     (== #f x)
     (== (cons y (cons z '())) r)))
 
 `((#f _.0) (_.0 #f)))
 
-(test-check "testc11.tex-41" 
+(test-check "testc11.tex-41"
 (run* (q)
   (let ((a (== #t q))
         (b (== #f q)))
@@ -496,7 +496,7 @@
 
 '(#f))
 
-(test-check "testc11.tex-42" 
+(test-check "testc11.tex-42"
 (run* (q)
   (let ((a (== #t q))
         (b (fresh (x)
@@ -509,33 +509,33 @@
 
 '(#f))
 
-(test-check "testc12.tex-1" 
+(test-check "testc12.tex-1"
 (let ((x (lambda (a) a))
       (y 'c))
   (x y))
 
 'c)
 
-(test-check "testc12.tex-2" 
+(test-check "testc12.tex-2"
 (run* (r)
   (fresh (y x)
     (== `(,x ,y) r)))
 
 (list `(_.0 _.1)))
 
-(test-check "testc12.tex-3" 
+(test-check "testc12.tex-3"
 (run* (r)
   (fresh (v w)
     (== (let ((x v) (y w)) `(,x ,y)) r)))
 
 `((_.0 _.1)))
 
-(test-check "testc12.tex-4"   
+(test-check "testc12.tex-4"
 (car `(grape raisin pear))
 
 `grape)
 
-(test-check "testc12.tex-5" 
+(test-check "testc12.tex-5"
 (car `(a c o r n))
 
 'a)
@@ -547,7 +547,7 @@
       (== (cons a d) p))))
 
 
-(test-check "testc12.tex-6" 
+(test-check "testc12.tex-6"
 (run* (r)
   (caro `(a c o r n) r))
 
@@ -555,15 +555,15 @@
 
 (test-check "testc12.tex-7" 'a
 
-          (car 
-        
+          (car
+
 `(a c o r n)
 
           ))
-        
 
-(test-check "testc12.tex-8"   
-(run* (q) 
+
+(test-check "testc12.tex-8"
+(run* (q)
   (caro `(a c o r n) 'a)
   (== #t q))
 
@@ -572,13 +572,13 @@
 (test-check "testc12.tex-9" 'a
 
           (car
-        
+
 `(a c o r n)
 
           ))
-        
 
-(test-check "testc12.tex-10" 
+
+(test-check "testc12.tex-10"
 (run* (r)
   (fresh (x y)
     (caro `(,r ,y) x)
@@ -587,14 +587,14 @@
 (list 'pear))
 
 
-(test-check "testc12.tex-11"   
-(cons 
+(test-check "testc12.tex-11"
+(cons
   (car `(grape raisin pear))
   (car `((a) (b) (c))))
 
 `(grape a))
 
-(test-check "testc12.tex-12" 
+(test-check "testc12.tex-12"
 (run* (r)
   (fresh (x y)
     (caro `(grape raisin pear) x)
@@ -603,12 +603,12 @@
 
 (list `(grape a)))
 
-(test-check "testc12.tex-13"   
+(test-check "testc12.tex-13"
 (cdr `(grape raisin pear))
 
 `(raisin pear))
 
-(test-check "testc12.tex-14"   
+(test-check "testc12.tex-14"
 (car (cdr `(a c o r n)))
 
 'c)
@@ -620,7 +620,7 @@
       (== (cons a d) p))))
 
 
-(test-check "testc12.tex-15" 
+(test-check "testc12.tex-15"
 (run* (r)
   (fresh (v)
     (cdro `(a c o r n) v)
@@ -629,14 +629,14 @@
 (list 'c))
 
 
-(test-check "testc12.tex-16"   
-(cons 
+(test-check "testc12.tex-16"
+(cons
   (cdr `(grape raisin pear))
   (car `((a) (b) (c))))
 
 `((raisin pear) a))
 
-(test-check "testc12.tex-17" 
+(test-check "testc12.tex-17"
 (run* (r)
   (fresh (x y)
     (cdro `(grape raisin pear) x)
@@ -645,23 +645,23 @@
 
 (list `((raisin pear) a)))
 
-(test-check "testc12.tex-18"   
-(run* (q) 
-  (cdro '(a c o r n) '(c o r n)) 
+(test-check "testc12.tex-18"
+(run* (q)
+  (cdro '(a c o r n) '(c o r n))
   (== #t q))
 
 (list #t))
 
 (test-check "testc12.tex-19" `(c o r n)
 
-   (cdr 
- 
+   (cdr
+
 '(a c o r n)
 
    ))
- 
 
-(test-check "testc12.tex-20" 
+
+(test-check "testc12.tex-20"
 (run* (x)
   (cdro '(c o r n) `(,x r n)))
 
@@ -669,16 +669,16 @@
 
 (test-check "testc12.tex-21" `(o r n)
 
-   (cdr 
- 
+   (cdr
+
 `(c o r n)
 
    ))
- 
 
-(test-check "testc12.tex-22" 
+
+(test-check "testc12.tex-22"
 (run* (l)
-  (fresh (x) 
+  (fresh (x)
     (cdro l '(c o r n))
     (caro l x)
     (== 'a x)))
@@ -691,13 +691,13 @@
     (== (cons a d) p)))
 
 
-(test-check "testc12.tex-23" 
+(test-check "testc12.tex-23"
 (run* (l)
   (conso '(a b c) '(d e) l))
 
 (list `((a b c) d e)))
 
-(test-check "testc12.tex-24" 
+(test-check "testc12.tex-24"
 (run* (x)
   (conso x '(a b c) '(d a b c)))
 
@@ -706,7 +706,7 @@
 (test-check "testc12.tex-25" (cons 'd '(a b c))
 `(d a b c))
 
-(test-check "testc12.tex-26" 
+(test-check "testc12.tex-26"
 (run* (r)
   (fresh (x y z)
     (== `(e a d ,x) r)
@@ -714,19 +714,19 @@
 
 (list `(e a d c)))
 
-(test-check "testc12.tex-27" 
+(test-check "testc12.tex-27"
 (run* (x)
   (conso x `(a ,x c) `(d a ,x c)))
 
 (list 'd))
 
          (define x 'd)
-       
+
 
 (test-check "testc12.tex-28" (cons x `(a ,x c))
 `(d a ,x c))
 
-(test-check "testc12.tex-29" 
+(test-check "testc12.tex-29"
 (run* (l)
   (fresh (x)
     (== `(d a ,x c) l)
@@ -734,7 +734,7 @@
 
 (list `(d a d c)))
 
-(test-check "testc12.tex-30" 
+(test-check "testc12.tex-30"
 (run* (l)
   (fresh (x)
     (conso x `(a ,x c) l)
@@ -743,7 +743,7 @@
 (list `(d a d c)))
 
 
-(test-check "testc12.tex-31" 
+(test-check "testc12.tex-31"
 (run* (l)
   (fresh (d x y w s)
     (conso w '(a n s) s)
@@ -756,12 +756,12 @@
 
 (list `(b e a n s)))
 
-(test-check "testc12.tex-32"   
+(test-check "testc12.tex-32"
 (null? `(grape raisin pear))
 
 #f)
 
-(test-check "testc12.tex-33"   
+(test-check "testc12.tex-33"
 (null? '())
 
 #t)
@@ -772,33 +772,33 @@
     (== '() x)))
 
 
-(test-check "testc12.tex-34" 
+(test-check "testc12.tex-34"
 (run* (q)
   (nullo `(grape raisin pear))
   (== #t q))
 
 `())
 
-(test-check "testc12.tex-35" 
+(test-check "testc12.tex-35"
 (run* (q)
   (nullo '())
   (== #t q))
 
 `(#t))
 
-(test-check "testc12.tex-36"   
-(run* (x) 
+(test-check "testc12.tex-36"
+(run* (x)
   (nullo x))
 
 `(()))
 
 
-(test-check "testc12.tex-37" 
+(test-check "testc12.tex-37"
 (eq? 'pear 'plum)
 
 #f)
 
-(test-check "testc12.tex-38"   
+(test-check "testc12.tex-38"
 (eq? 'plum 'plum)
 
 #t)
@@ -809,14 +809,14 @@
     (== x y)))
 
 
-(test-check "testc12.tex-39" 
+(test-check "testc12.tex-39"
 (run* (q)
   (eqo 'pear 'plum)
   (== #t q))
 
 `())
 
-(test-check "testc12.tex-40" 
+(test-check "testc12.tex-40"
 (run* (q)
   (eqo 'plum 'plum)
   (== #t q))
@@ -824,33 +824,33 @@
 `(#t))
 
 
-(test-check "testc12.tex-41"   
+(test-check "testc12.tex-41"
 (pair? `((split) . pea))
 
 #t)
 
-(test-check "testc12.tex-42"   
+(test-check "testc12.tex-42"
 (pair? '())
 
 #f)
 
-(test-check "testc12.tex-43" 
+(test-check "testc12.tex-43"
 (car `(pear))
 
 `pear)
 
-(test-check "testc12.tex-44" 
+(test-check "testc12.tex-44"
 (cdr `(pear))
 
 `())
 
-(test-check "testc12.tex-45"   
+(test-check "testc12.tex-45"
 (cons `(split) 'pea)
 
 `((split) . pea))
 
-(test-check "testc12.tex-46"   
-(run* (r) 
+(test-check "testc12.tex-46"
+(run* (r)
   (fresh (x y)
     (== (cons x (cons y 'salad)) r)))
 
@@ -862,35 +862,35 @@
       (conso a d p))))
 
 
-(test-check "testc12.tex-47" 
+(test-check "testc12.tex-47"
 (run* (q)
   (pairo (cons q q))
   (== #t q))
 
 `(#t))
 
-(test-check "testc12.tex-48" 
+(test-check "testc12.tex-48"
 (run* (q)
   (pairo '())
   (== #t q))
 
 `())
 
-(test-check "testc12.tex-49" 
+(test-check "testc12.tex-49"
 (run* (q)
   (pairo 'pair)
   (== #t q))
 
 `())
 
-(test-check "testc12.tex-50"   
-(run* (x) 
+(test-check "testc12.tex-50"
+(run* (x)
   (pairo x))
 
 (list `(_.0 . _.1)))
 
-(test-check "testc12.tex-51"   
-(run* (r) 
+(test-check "testc12.tex-51"
+(run* (r)
   (pairo (cons r 'pear)))
 
 (list `_.0))
@@ -903,22 +903,22 @@
       (else #f))))
 
 
-(test-check "testc14.tex-1"   
+(test-check "testc14.tex-1"
 (new-list? `((a) (a b) c))
 
 #t)
 
-(test-check "testc14.tex-2"   
+(test-check "testc14.tex-2"
 (new-list? `())
 
 #t)
 
-(test-check "testc14.tex-3"   
+(test-check "testc14.tex-3"
 (new-list? 's)
 
 #f)
 
-(test-check "testc14.tex-4"   
+(test-check "testc14.tex-4"
 (new-list? `(d a t e . s))
 
 #f)
@@ -955,18 +955,18 @@
          (listo d))))))
 
 
-(test-check "testc14.tex-5" 
+(test-check "testc14.tex-5"
 (run* (x)
   (listo `(a b ,x d)))
 
 (list `_.0))
 
-(test-check "testc14.tex-6" 
+(test-check "testc14.tex-6"
 (run1 (x)
   (listo `(a b c . ,x)))
 
 (list `()))
-(define e (make-engine (lambda () 
+(define e (make-engine (lambda ()
 (run* (x)
   (listo `(a b c . ,x)))
 )))
@@ -976,7 +976,7 @@
 (lambda (e^) (void)))
 
 
-(test-check "testc14.tex-8" 
+(test-check "testc14.tex-8"
 (run5 (x)
   (listo `(a b c . ,x)))
 
@@ -1000,7 +1000,7 @@
   (lambda (l)
     (conde
       ((nullo l) succeed)
-      ((fresh (a) 
+      ((fresh (a)
          (caro l a)
          (listo a))
        (fresh (d)
@@ -1008,21 +1008,21 @@
          (lolo d))))))
 
 
-(test-check "testc14.tex-9" 
-(run1 (l)                                                                       
-  (lolo l))                                                                     
+(test-check "testc14.tex-9"
+(run1 (l)
+  (lolo l))
 
 `(()))
 
-(test-check "testc14.tex-10" 
+(test-check "testc14.tex-10"
 (run* (q)
-  (fresh (x y) 
+  (fresh (x y)
     (lolo `((a b) (,x c) (d ,y)))
     (== #t q)))
 
 (list #t))
 
-(test-check "testc14.tex-11" 
+(test-check "testc14.tex-11"
 (run1 (q)
   (fresh (x)
     (lolo `((a b) . ,x))
@@ -1030,19 +1030,19 @@
 
 (list #t))
 
-(test-check "testc14.tex-12" 
+(test-check "testc14.tex-12"
 (run1 (x)
   (lolo `((a b) (c d) . ,x)))
 
 `(()))
 
-(test-check "testc14.tex-13" 
+(test-check "testc14.tex-13"
 (run5 (x)
   (lolo `((a b) (c d) . ,x)))
 
 
 `(()
- (()) 
+ (())
  ((_.0))
  (() ())
  ((_.0 _.1)))
@@ -1055,15 +1055,15 @@
       (conso x '() y))))
 
 
-(test-check "testc14.tex-14" 
+(test-check "testc14.tex-14"
 (run* (q)
   (twinso '(tofu tofu))
   (== #t q))
 
 (list #t))
 
-(test-check "testc14.tex-15" 
-(run* (z) 
+(test-check "testc14.tex-15"
+(run* (z)
   (twinso `(,z tofu)))
 
 (list `tofu))
@@ -1080,13 +1080,13 @@
          (loto d))))))
 
 
-(test-check "testc14.tex-16" 
+(test-check "testc14.tex-16"
 (run1 (z)
   (loto `((g g) . ,z)))
 
 (list `()))
 
-(test-check "testc14.tex-17" 
+(test-check "testc14.tex-17"
 (run5 (z)
   (loto `((g g) . ,z)))
 
@@ -1098,7 +1098,7 @@
  ((_.0 _.0) (_.1 _.1) (_.2 _.2) (_.3 _.3)))
 )
 
-(test-check "testc14.tex-18" 
+(test-check "testc14.tex-18"
 (run5 (r)
   (fresh (w x y z)
     (loto `((g g) (e ,w) (,x ,y) . ,z))
@@ -1112,7 +1112,7 @@
  (e (_.0 _.0) ((_.1 _.1) (_.2 _.2) (_.3 _.3) (_.4 _.4))))
 )
 
-(test-check "testc14.tex-19" 
+(test-check "testc14.tex-19"
 (run3 (out)
   (fresh (w x y z)
     (== `((g g) (e ,w) (,x ,y) . ,z) out)
@@ -1136,7 +1136,7 @@
          (listofo predo d))))))
 
 
-(test-check "testc14.tex-20" 
+(test-check "testc14.tex-20"
 (run3 (out)
   (fresh (w x y z)
     (== `((g g) (e ,w) (,x ,y) . ,z) out)
@@ -1161,7 +1161,7 @@
       (else (member? x (cdr l))))))
 
 
-(test-check "testc14.tex-21" 
+(test-check "testc14.tex-21"
 (member? 'olive `(virgin olive oil))
 
 #t)
@@ -1180,62 +1180,62 @@
           (membero x d))))))
 
 
-(test-check "testc14.tex-22"   
-(run* (q) 
+(test-check "testc14.tex-22"
+(run* (q)
   (membero 'olive `(virgin olive oil))
   (== #t q))
 
 (list #t))
 
-(test-check "testc14.tex-23"   
-(run1 (y) 
+(test-check "testc14.tex-23"
+(run1 (y)
   (membero y `(hummus with pita)))
 
 (list `hummus))
 
-(test-check "testc14.tex-24"   
-(run1 (y) 
+(test-check "testc14.tex-24"
+(run1 (y)
   (membero y `(with pita)))
 
 (list `with))
 
-(test-check "testc14.tex-25"   
-(run1 (y) 
+(test-check "testc14.tex-25"
+(run1 (y)
   (membero y `(pita)))
 
 (list `pita))
 
-(test-check "testc14.tex-26"   
-(run* (y) 
+(test-check "testc14.tex-26"
+(run* (y)
   (membero y `()))
 
 `())
 
-(test-check "testc14.tex-27"   
-(run* (y) 
+(test-check "testc14.tex-27"
+(run* (y)
   (membero y `(hummus with pita)))
 
 `(hummus with pita))
 
-(test-check "testc14.tex-28"   
-(run* (x) 
+(test-check "testc14.tex-28"
+(run* (x)
   (membero 'e `(pasta ,x fagioli)))
 
 (list `e))
 
-(test-check "testc14.tex-29"   
-(run1 (x) 
+(test-check "testc14.tex-29"
+(run1 (x)
   (membero 'e `(pasta e ,x fagioli)))
 
 (list `_.0))
 
-(test-check "testc14.tex-30"   
-(run1 (x) 
+(test-check "testc14.tex-30"
+(run1 (x)
   (membero 'e `(pasta ,x e fagioli)))
 
 (list `e))
 
-(test-check "testc14.tex-31"   
+(test-check "testc14.tex-31"
 (run* (r)
   (fresh (x y)
     (membero 'e `(pasta ,x fagioli ,y))
@@ -1243,13 +1243,13 @@
 
 `((e _.0) (_.0 e)))
 
-(test-check "testc14.tex-32"   
-(run1 (l) 
+(test-check "testc14.tex-32"
+(run1 (l)
   (membero 'tofu l))
 
 `((tofu . _.0)))
-(define e (make-engine (lambda ()   
-(run* (l) 
+(define e (make-engine (lambda ()
+(run* (l)
   (membero 'tofu l))
 )))
 (printf "Testing testc14.tex-33  (engine with ~s ticks fuel)\n" max-ticks)
@@ -1258,7 +1258,7 @@
 (lambda (e^) (void)))
 
 
-(test-check "testc14.tex-34" 
+(test-check "testc14.tex-34"
 (run5 (l)
   (membero 'tofu l))
 
@@ -1279,7 +1279,7 @@
          (pmembero x d))))))
 
 
-(test-check "testc14.tex-35"   
+(test-check "testc14.tex-35"
 (run5 (l)
   (pmembero 'tofu l))
 
@@ -1291,7 +1291,7 @@
  (_.0 _.1 _.2 _.3 tofu))
 )
 
-(test-check "testc14.tex-36"   
+(test-check "testc14.tex-36"
 (run* (q)
   (pmembero 'tofu `(a b tofu d tofu))
   (== #t q))
@@ -1310,7 +1310,7 @@
          (pmembero x d))))))
 
 
-(test-check "testc14.tex-37"   
+(test-check "testc14.tex-37"
 (run* (q)
   (pmembero 'tofu `(a b tofu d tofu))
   (== #t q))
@@ -1330,14 +1330,14 @@
          (pmembero x d))))))
 
 
-(test-check "testc14.tex-38"   
+(test-check "testc14.tex-38"
 (run* (q)
   (pmembero 'tofu `(a b tofu d tofu))
   (== #t q))
 
 `(#t #t))
 
-(test-check "testc14.tex-39" 
+(test-check "testc14.tex-39"
 (run12 (l)
   (pmembero 'tofu l))
 
@@ -1361,38 +1361,38 @@
     (cond
       ((null? l) #f)
       ((eq? (car l) x) l)
-      (else (mem x (cdr l))))))    
+      (else (mem x (cdr l))))))
 
 
-(test-check "testc15.tex-1"   
+(test-check "testc15.tex-1"
 (mem 'tofu `(a b tofu d peas e))
 
 `(tofu d peas e))
 
-(test-check "testc15.tex-2"   
+(test-check "testc15.tex-2"
 (mem 'tofu `(a b peas d peas e))
 
 #f)
 
-(test-check "testc15.tex-3"   
-(run* (out) 
+(test-check "testc15.tex-3"
+(run* (out)
   (== (mem 'tofu `(a b tofu d peas e)) out))
 
 (list `(tofu d peas e)))
 
-(test-check "testc15.tex-4"   
-(mem 'peas 
+(test-check "testc15.tex-4"
+(mem 'peas
   (mem 'tofu `(a b tofu d peas e)))
 
 `(peas e))
 
-(test-check "testc15.tex-5"   
-(mem 'tofu 
+(test-check "testc15.tex-5"
+(mem 'tofu
   (mem 'tofu `(a b tofu d tofu e)))
 
 `(tofu d tofu e))
 
-(test-check "testc15.tex-6"   
+(test-check "testc15.tex-6"
 (mem 'tofu
   (cdr (mem 'tofu `(a b tofu d tofu e))))
 
@@ -1433,20 +1433,20 @@
          (memo x d out))))))
 
 
-(test-check "testc15.tex-7"   
-(run1 (out) 
+(test-check "testc15.tex-7"
+(run1 (out)
   (memo 'tofu `(a b tofu d tofu e) out))
 
 `((tofu d tofu e)))
 
-(test-check "testc15.tex-8"   
-(run1 (out) 
+(test-check "testc15.tex-8"
+(run1 (out)
   (fresh (x)
     (memo 'tofu `(a b ,x d tofu e) out)))
 
 `((tofu d tofu e)))
 
-(test-check "testc15.tex-9"   
+(test-check "testc15.tex-9"
 (run* (r)
   (memo r
     `(a b tofu d tofu e)
@@ -1454,40 +1454,40 @@
 
 (list `tofu))
 
-(test-check "testc15.tex-10" 
+(test-check "testc15.tex-10"
 (run* (q)
   (memo 'tofu '(tofu e) '(tofu e))
   (== #t q))
 
 (list #t))
 
-(test-check "testc15.tex-11" 
+(test-check "testc15.tex-11"
 (run* (q)
   (memo 'tofu '(tofu e) '(tofu))
   (== #t q))
 
 `())
 
-(test-check "testc15.tex-12" 
+(test-check "testc15.tex-12"
 (run* (x)
   (memo 'tofu '(tofu e) `(,x e)))
 
 (list `tofu))
 
-(test-check "testc15.tex-13" 
+(test-check "testc15.tex-13"
 (run* (x)
   (memo 'tofu '(tofu e) `(peas ,x)))
 
 `())
 
-(test-check "testc15.tex-14"   
-(run* (out) 
-  (fresh (x) 
+(test-check "testc15.tex-14"
+(run* (out)
+  (fresh (x)
     (memo 'tofu `(a b ,x d tofu e) out)))
 
 `((tofu d tofu e) (tofu e)))
 
-(test-check "testc15.tex-15" 
+(test-check "testc15.tex-15"
 (run12 (z)
   (fresh (u)
     (memo 'tofu `(a b tofu d tofu e . ,z) u)))
@@ -1512,12 +1512,12 @@
     (cond
       ((null? l) '())
       ((eq? (car l) x) (cdr l))
-      (else 
+      (else
         (cons (car l)
           (rember x (cdr l)))))))
 
 
-(test-check "testc15.tex-16"   
+(test-check "testc15.tex-16"
 (rember 'peas '(a b peas d peas e))
 
 `(a b d peas e))
@@ -1586,14 +1586,14 @@
   ))))
 
 
-(test-check "testc15.tex-17" 
+(test-check "testc15.tex-17"
 (run1 (out)
   (fresh (y)
     (rembero 'peas `(a b ,y d peas e) out)))
 
 `((a b d peas e)))
 
-(test-check "testc15.tex-18" 
+(test-check "testc15.tex-18"
 (run* (out)
   (fresh (y z)
     (rembero y `(a b ,y d ,z e) out)))
@@ -1608,9 +1608,9 @@
  (a b _.0 d _.1 e))
 )
 
-(test-check "testc15.tex-19" 
-(run* (r) 
-  (fresh (y z) 
+(test-check "testc15.tex-19"
+(run* (r)
+  (fresh (y z)
     (rembero y `(,y d ,z e) `(,y d e))
     (== `(,y ,z) r)))
 
@@ -1621,13 +1621,13 @@
  (e e))
 )
 
-(test-check "testc15.tex-20" 
+(test-check "testc15.tex-20"
 (run13 (w)
   (fresh (y z out)
     (rembero y `(a b ,y d ,z . ,w) out)))
 
 
-`(_.0 
+`(_.0
  _.0
  _.0
  _.0
@@ -1647,20 +1647,20 @@
     (rembero s '(a b c) '(a b c))))
 
 
-(test-check "testc15.tex-21" 
+(test-check "testc15.tex-21"
 (run* (r)
   (== 'd r)
   (surpriseo r))
 
 (list 'd))
 
-(test-check "testc15.tex-22" 
+(test-check "testc15.tex-22"
 (run* (r)
   (surpriseo r))
 
 `(_.0))
 
-(test-check "testc15.tex-23" 
+(test-check "testc15.tex-23"
 (run* (r)
   (== 'b r)
   (surpriseo r))
@@ -1675,22 +1675,22 @@
               (new-append (cdr l) s))))))
 
 
-(test-check "testc16.tex-1" 
+(test-check "testc16.tex-1"
 (new-append `(a b c) `(d e))
 
 `(a b c d e))
 
-(test-check "testc16.tex-2"   
+(test-check "testc16.tex-2"
 (new-append '(a b c) '())
 
 `(a b c))
 
-(test-check "testc16.tex-3"   
+(test-check "testc16.tex-3"
 (new-append '() '(d e))
 
 `(d e))
 
-(test-check "testc16.tex-4"   
+(test-check "testc16.tex-4"
 (new-append '(d e) 'a)
 
 `(d e . a))
@@ -1701,12 +1701,12 @@
       ((nullo l) (== s out))
       ((fresh (a d res)
          (caro l a)
-         (cdro l d)   
+         (cdro l d)
          (appendo d s res)
          (conso a res out))))))
 
 
-(test-check "testc16.tex-5" 
+(test-check "testc16.tex-5"
 (run* (x)
   (appendo
     '(cake)
@@ -1715,7 +1715,7 @@
 
 (list `(cake tastes yummy)))
 
-(test-check "testc16.tex-6" 
+(test-check "testc16.tex-6"
 (run* (x)
   (fresh (y)
     (appendo
@@ -1725,7 +1725,7 @@
 
 (list `(cake with ice _.0 tastes yummy)))
 
-(test-check "testc16.tex-7" 
+(test-check "testc16.tex-7"
 (run* (x)
   (fresh (y)
     (appendo
@@ -1735,14 +1735,14 @@
 
 (list `(cake with ice cream . _.0)))
 
-(test-check "testc16.tex-8" 
+(test-check "testc16.tex-8"
 (run1 (x)
   (fresh (y)
     (appendo `(cake with ice . ,y) '(d t) x)))
 
 (list `(cake with ice d t)))
 
-(test-check "testc16.tex-9" 
+(test-check "testc16.tex-9"
 (run1 (y)
   (fresh (x)
     (appendo `(cake with ice . ,y) '(d t) x)))
@@ -1761,7 +1761,7 @@
          (conso a res out))))))
 
 
-(test-check "testc16.tex-10" 
+(test-check "testc16.tex-10"
 (run5 (x)
   (fresh (y)
     (appendo `(cake with ice . ,y) '(d t) x)))
@@ -1774,7 +1774,7 @@
  (cake with ice _.0 _.1 _.2 _.3 d t))
 )
 
-(test-check "testc16.tex-11" 
+(test-check "testc16.tex-11"
 (run5 (y)
   (fresh (x)
     (appendo `(cake with ice . ,y) '(d t) x)))
@@ -1787,21 +1787,21 @@
  (_.0 _.1 _.2 _.3))
 )
 
- (define y 
+ (define y
 
 `(_.0 _.1 _.2)
 
- ) 
+ )
 
 
-(test-check "testc16.tex-12" 
+(test-check "testc16.tex-12"
 `(cake with ice . ,y)
 
 
 `(cake with ice . (_.0 _.1 _.2))
 )
 
-(test-check "testc16.tex-13" 
+(test-check "testc16.tex-13"
 (run5 (x)
   (fresh (y)
     (appendo
@@ -1817,7 +1817,7 @@
  (cake with ice _.0 _.1 _.2 _.3 d t _.0 _.1 _.2 _.3))
 )
 
-(test-check "testc16.tex-14" 
+(test-check "testc16.tex-14"
 (run* (x)
   (fresh (z)
     (appendo
@@ -1829,7 +1829,7 @@
 `((cake with ice cream d t . _.0))
 )
 
-(test-check "testc16.tex-15" 
+(test-check "testc16.tex-15"
 (run6 (x)
   (fresh (y)
     (appendo x y `(cake with ice d t))))
@@ -1843,7 +1843,7 @@
  (cake with ice d t))
 )
 
-(test-check "testc16.tex-16" 
+(test-check "testc16.tex-16"
 (run6 (y)
   (fresh (x)
     (appendo x y `(cake with ice d t))))
@@ -1884,7 +1884,7 @@
     (appendxyquestion)
     appendxyanswer)
 
-(define e (make-engine (lambda () 
+(define e (make-engine (lambda ()
 (run7 (r)
   (fresh (x y)
     (appendo x y `(cake with ice d t))
@@ -1906,7 +1906,7 @@
          (appendo d s res))))))
 
 
-(test-check "testc16.tex-18" 
+(test-check "testc16.tex-18"
 (run7 (r)
   (fresh (x y)
     (appendo x y `(cake with ice d t))
@@ -1916,7 +1916,7 @@
   appendxyanswer)
 
 
-(test-check "testc16.tex-19" 
+(test-check "testc16.tex-19"
 (run7 (x)
   (fresh (y z)
     (appendo x y z)))
@@ -1931,22 +1931,22 @@
  (_.0 _.1 _.2 _.3 _.4 _.5))
 )
 
-(test-check "testc16.tex-20" 
+(test-check "testc16.tex-20"
 (run7 (y)
   (fresh (x z)
     (appendo x y z)))
 
 
-`(_.0 
- _.0 
- _.0 
+`(_.0
  _.0
- _.0 
- _.0  
+ _.0
+ _.0
+ _.0
+ _.0
  _.0)
 )
 
-(test-check "testc16.tex-21" 
+(test-check "testc16.tex-21"
 (run7 (z)
   (fresh (x y)
     (appendo x y z)))
@@ -1961,7 +1961,7 @@
  (_.0 _.1 _.2 _.3 _.4 _.5 . _.6))
 )
 
-(test-check "testc16.tex-22" 
+(test-check "testc16.tex-22"
 (run7 (r)
   (fresh (x y z)
     (appendo x y z)
@@ -1987,7 +1987,7 @@
       ((nullo l) (== s out)))))
 
 
-(test-check "testc16.tex-23" 
+(test-check "testc16.tex-23"
 (run7 (r)
   (fresh (x y z)
     (swappendo x y z)
@@ -2010,12 +2010,12 @@
       (else x))))
 
 
-(test-check "testc16.tex-24" 
+(test-check "testc16.tex-24"
 (unwrap '((((pizza)))))
 
 `pizza)
 
-(test-check "testc16.tex-25" 
+(test-check "testc16.tex-25"
 (unwrap '((((pizza pie) with)) extra cheese))
 
 `pizza)
@@ -2030,7 +2030,7 @@
       ((== x out)))))
 
 
-(test-check "testc16.tex-26" 
+(test-check "testc16.tex-26"
 (run* (x)
   (unwrapo '(((pizza))) x))
 
@@ -2041,7 +2041,7 @@
  pizza)
   )
 
-(test-check "testc16.tex-27" 
+(test-check "testc16.tex-27"
 (run1 (x)
   (unwrapo x 'pizza))
 
@@ -2049,7 +2049,7 @@
 `(pizza)
 )
 
-(test-check "testc16.tex-28" 
+(test-check "testc16.tex-28"
 (run1 (x)
   (unwrapo `((,x)) 'pizza))
 
@@ -2057,7 +2057,7 @@
 `(pizza)
 )
 
-(test-check "testc16.tex-29" 
+(test-check "testc16.tex-29"
 (run5 (x)
   (unwrapo x 'pizza))
 
@@ -2069,7 +2069,7 @@
  ((((pizza . _.0) . _.1) . _.2) . _.3))
 )
 
-(test-check "testc16.tex-30" 
+(test-check "testc16.tex-30"
 (run5 (x)
   (unwrapo x '((pizza))))
 
@@ -2081,7 +2081,7 @@
  ((((((pizza)) . _.0) . _.1) . _.2) . _.3))
 )
 
-(test-check "testc16.tex-31" 
+(test-check "testc16.tex-31"
 (run5 (x)
   (unwrapo `((,x)) 'pizza))
 
@@ -2104,7 +2104,7 @@
       (else (cons s '())))))
 
 
-(test-check "testc16.tex-32" 
+(test-check "testc16.tex-32"
 (flatten '((a b) c))
 
 `(a b c))
@@ -2122,7 +2122,7 @@
       ((conso s '() out)))))
 
 
-(test-check "testc16.tex-33" 
+(test-check "testc16.tex-33"
 (run10 (x)
   (flatteno '((a b) c) x))
 
@@ -2139,7 +2139,7 @@
  (a b c))
 )
 
-(test-check "testc16.tex-34" 
+(test-check "testc16.tex-34"
 (run10 (x)
   (flatteno '(a (b c)) x))
 
@@ -2156,7 +2156,7 @@
  (a b c () ()))
 )
 
-(test-check "testc16.tex-35" 
+(test-check "testc16.tex-35"
 (run* (x)
   (flatteno '(a) x))
 
@@ -2166,7 +2166,7 @@
  (a ()))
 )
 
-(test-check "testc16.tex-36" 
+(test-check "testc16.tex-36"
 (run* (x)
   (flatteno '((a)) x))
 
@@ -2180,7 +2180,7 @@
  (a () ()))
 )
 
-(test-check "testc16.tex-37" 
+(test-check "testc16.tex-37"
 (run* (x)
   (flatteno '(((a))) x))
 
@@ -2234,7 +2234,7 @@
     (flattenogrumblequestion)
     flattenogrumbleanswer)
 
-(define e (make-engine (lambda () 
+(define e (make-engine (lambda ()
 (run* (x)
   (flatteno x '(a b c)))
 )))
@@ -2244,7 +2244,7 @@
 (lambda (e^) (void)))
 
 
-(test-check "testc16.tex-39" 
+(test-check "testc16.tex-39"
 (length
   (run* (x)
     (flatteno '((((a (((b))) c))) d) x)))
@@ -2255,7 +2255,7 @@
   (fresh ()
     strangeo))
 
-(define e (make-engine (lambda ()   
+(define e (make-engine (lambda ()
 (run1 (x)
   strangeo)
 )))
@@ -2265,7 +2265,7 @@
 (lambda (e^) (void)))
 
 
-(test-check "testc17.tex-2" 
+(test-check "testc17.tex-2"
 (run1 (q)
   (conde
     (strangeo)
@@ -2274,15 +2274,15 @@
 `(_.0))
 
 (define strangero
-  (conde 
-    (strangero (conde 
-                 (strangero) 
+  (conde
+    (strangero (conde
+                 (strangero)
                  (succeed)))
     (succeed)))
 
 
-(test-check "testc17.tex-3" 
-(run5 (q) 
+(test-check "testc17.tex-3"
+(run5 (q)
   strangero)
 
 `(_.0 _.0 _.0 _.0 _.0))
@@ -2294,7 +2294,7 @@
       ((== #f x)))))
 
 
-(test-check "testc17.tex-4" 
+(test-check "testc17.tex-4"
 (run5 (q)
   (fresh (x y)
     (strangesto x y)
@@ -2311,9 +2311,9 @@
 
 (define never (any* fail))
 
-(define e (make-engine (lambda ()   
+(define e (make-engine (lambda ()
 (run1 (q)
-  never 
+  never
   (== #t q))
 )))
 (printf "Testing testc17.tex-5  (engine with ~s ticks fuel)\n" max-ticks)
@@ -2321,24 +2321,24 @@
 (lambda (t v) (error 'testc17.tex-5 "infinite loop returned ~s after ~s ticks" v (- max-ticks t)))
 (lambda (e^) (void)))
 
-  
+
 (run1 (q)
   fail
   never)
 
- 
+
 (define always (any* succeed))
 
 
-(test-check "testc17.tex-6"   
-(run1 (q) 
-  always 
+(test-check "testc17.tex-6"
+(run1 (q)
+  always
   (== #t q))
 
 (list #t))
-(define e (make-engine (lambda ()   
-(run* (q) 
-  always 
+(define e (make-engine (lambda ()
+(run* (q)
+  always
   (== #t q))
 )))
 (printf "Testing testc17.tex-7  (engine with ~s ticks fuel)\n" max-ticks)
@@ -2347,16 +2347,16 @@
 (lambda (e^) (void)))
 
 
-(test-check "testc17.tex-8"   
-(run5 (q) 
-  always 
+(test-check "testc17.tex-8"
+(run5 (q)
+  always
   (== #t q))
 
 `(#t #t #t #t #t))
 
-(test-check "testc17.tex-9"   
-(run5 (q) 
-  (== #t q) 
+(test-check "testc17.tex-9"
+(run5 (q)
+  (== #t q)
   always)
 
 `(#t #t #t #t #t))
@@ -2368,20 +2368,20 @@
       (g))))
 
 
-(test-check "testc17.tex-10"   
+(test-check "testc17.tex-10"
 (run1 (q)
   (salo always)
   (== #t q))
 
 `(#t))
 
-(test-check "testc17.tex-11" 
+(test-check "testc17.tex-11"
 (run1 (q)
   (salo never)
   (== #t q))
 
 `(#t))
-(define e (make-engine (lambda () 
+(define e (make-engine (lambda ()
 (run* (q)
   (salo never)
   (== #t q))
@@ -2391,7 +2391,7 @@
 (lambda (t v) (error 'testc17.tex-12 "infinite loop returned ~s after ~s ticks" v (- max-ticks t)))
 (lambda (e^) (void)))
 
-(define e (make-engine (lambda () 
+(define e (make-engine (lambda ()
 (run1 (q)
   (salo never)
   fail
@@ -2402,9 +2402,9 @@
 (lambda (t v) (error 'testc17.tex-13 "infinite loop returned ~s after ~s ticks" v (- max-ticks t)))
 (lambda (e^) (void)))
 
-(define e (make-engine (lambda ()   
-(run1 (q) 
-  always 
+(define e (make-engine (lambda ()
+(run1 (q)
+  always
   fail
   (== #t q))
 )))
@@ -2414,7 +2414,7 @@
 (lambda (e^) (void)))
 
 
-(test-check "testc17.tex-15"   
+(test-check "testc17.tex-15"
 (run1 (q)
   (conde
     ((== #f q) always)
@@ -2422,7 +2422,7 @@
   (== #t q))
 
 `(#t))
-(define e (make-engine (lambda () 
+(define e (make-engine (lambda ()
 (run2 (q)
   (conde
     ((== #f q) always)
@@ -2435,19 +2435,19 @@
 (lambda (e^) (void)))
 
 
-(test-check "testc17.tex-17"   
+(test-check "testc17.tex-17"
 (run5 (q)
-  (conde                                                                  
-    ((== #f q) always)                                              
-    ((any* (== #t q)))) 
+  (conde
+    ((== #f q) always)
+    ((any* (== #t q))))
   (== #t q))
 
 
 `(#t #t #t #t #t)
 )
 
-(test-check "testc17.tex-18" 
-(run5 (q)                                                                  
+(test-check "testc17.tex-18"
+(run5 (q)
   (conde
     (always)
     (never))
@@ -2455,35 +2455,35 @@
 
 `(#t #t #t #t #t))
 
-(test-check "testc17.tex-19"   
-(run1 (q)                                                                  
-  (fresh ()                                                                    
+(test-check "testc17.tex-19"
+(run1 (q)
+  (fresh ()
     (conde
       ((== #f q))
-      ((== #t q)))                    
-    always)                                                        
+      ((== #t q)))
+    always)
   (== #t q))
 
 `(#t))
 
-(test-check "testc17.tex-20"   
+(test-check "testc17.tex-20"
 (run5 (q)
   (fresh ()
     (conde
       ((== #f q))
-      ((== #t q)))                    
-    always)                                                        
+      ((== #t q)))
+    always)
   (== #t q))
 
 `(#t #t #t #t #t))
 
-(test-check "testc17.tex-21"   
+(test-check "testc17.tex-21"
 (run5 (q)
   (fresh ()
     (conde
       ((== #t q))
       ((== #f q)))
-    always)                                           
+    always)
   (== #t q))
 
 `(#t #t #t #t #t))
@@ -2497,18 +2497,18 @@
       ((== 1 x) (== 1 y) (== 0 r)))))
 
 
-(test-check "testc20.tex-1" 
+(test-check "testc20.tex-1"
 (run* (s)
   (fresh (x y)
     (bit-xoro x y 0)
-    (== `(,x ,y) s)))  
-  
+    (== `(,x ,y) s)))
+
 
 `((0 0)
  (1 1))
 )
 
-(test-check "testc20.tex-2" 
+(test-check "testc20.tex-2"
 (run* (s)
   (fresh (x y)
     (bit-xoro x y 1)
@@ -2519,14 +2519,14 @@
  (1 0))
 )
 
-(test-check "testc20.tex-3" 
+(test-check "testc20.tex-3"
 (run* (s)
   (fresh (x y r)
     (bit-xoro x y r)
     (== `(,x ,y ,r) s)))
 
 
-`((0 0 0) 
+`((0 0 0)
  (0 1 1)
  (1 0 1)
  (1 1 0))
@@ -2541,12 +2541,12 @@
       ((== 1 x) (== 1 y) (== 1 r)))))
 
 
-(test-check "testc20.tex-4" 
+(test-check "testc20.tex-4"
 (run* (s)
   (fresh (x y)
     (bit-ando x y 1)
-    (== `(,x ,y) s)))  
-  
+    (== `(,x ,y) s)))
+
 
 `((1 1))
 )
@@ -2558,13 +2558,13 @@
       (bit-ando x y c))))
 
 
-(test-check "testc20.tex-5" 
+(test-check "testc20.tex-5"
 (run* (r)
   (half-addero 1 1 r 1))
 
 (list 0))
 
-(test-check "testc20.tex-6" 
+(test-check "testc20.tex-6"
 (run* (s)
   (fresh (x y r c)
     (half-addero x y r c)
@@ -2585,7 +2585,7 @@
       (bit-xoro xy wz c))))
 
 
-(test-check "testc20.tex-7" 
+(test-check "testc20.tex-7"
 (run* (s)
   (fresh (r c)
     (full-addero 0 1 1 r c)
@@ -2606,7 +2606,7 @@
       ((== 1 b) (== 1 x) (== 1 y) (== 1 r) (== 1 c)))))
 
 
-(test-check "testc20.tex-8" 
+(test-check "testc20.tex-8"
 (run* (s)
   (fresh (r c)
     (full-addero 1 1 1 r c)
@@ -2614,7 +2614,7 @@
 
 (list `(1 1)))
 
-(test-check "testc20.tex-9" 
+(test-check "testc20.tex-9"
 (run* (s)
   (fresh (b x y r c)
     (full-addero b x y r c)
@@ -2647,21 +2647,21 @@
 (test-check "testc20.tex-10" `(1 0 1)
 
     (build-num
- 
+
 5
 
     ))
- 
+
 
 (test-check "testc20.tex-11" `(1 1 1)
 
-    (build-num 
- 
+    (build-num
+
 7
 
     ))
- 
-(test-check "nine" (build-num 
+
+(test-check "nine" (build-num
 9
 
     )
@@ -2670,7 +2670,7 @@
 
     )
 
-(test-check "six" (build-num 
+(test-check "six" (build-num
 6
 
     )
@@ -2679,7 +2679,7 @@
 
     )
 
-(test-check "nineteen" (build-num 
+(test-check "nineteen" (build-num
 19
 
     )
@@ -2688,7 +2688,7 @@
 
     )
 
-(test-check "biggie" (build-num 
+(test-check "biggie" (build-num
 17290
 
     )
@@ -2713,7 +2713,7 @@
     (cond
       ((odd? n)
        (cons 1
-         (build-num (quotient (- n 1) 2))))    
+         (build-num (quotient (- n 1) 2))))
       ((and (not (zero? n)) (even? n))
        (cons 0
          (build-num (quotient n 2))))
@@ -2726,28 +2726,28 @@
       (== `(,a . ,d) n))))
 
 
-(test-check "testc20.tex-15" 
+(test-check "testc20.tex-15"
 (run* (q)
   (poso '(0 1 1))
   (== #t q))
 
 (list #t))
 
-(test-check "testc20.tex-16" 
+(test-check "testc20.tex-16"
 (run* (q)
   (poso '(1))
   (== #t q))
 
 (list #t))
 
-(test-check "testc20.tex-17" 
+(test-check "testc20.tex-17"
 (run* (q)
   (poso '())
   (== #t q))
 
 `())
 
-(test-check "testc20.tex-18" 
+(test-check "testc20.tex-18"
 (run* (r)
   (poso r))
 
@@ -2759,39 +2759,39 @@
       (== `(,a ,ad . ,dd) n))))
 
 
-(test-check "testc20.tex-19" 
+(test-check "testc20.tex-19"
 (run* (q)
   (>1o '(0 1 1))
   (== #t q))
 
 (list #t))
 
-(test-check "testc20.tex-20" 
+(test-check "testc20.tex-20"
 (run* (q)
   (>1o '(0 1))
   (== #t q))
 
 `(#t))
 
-(test-check "testc20.tex-21" 
+(test-check "testc20.tex-21"
 (run* (q)
   (>1o '(1))
   (== #t q))
 
 `())
 
-(test-check "testc20.tex-22" 
+(test-check "testc20.tex-22"
 (run* (q)
   (>1o '())
   (== #t q))
 
 `())
 
-(test-check "testc20.tex-23" 
+(test-check "testc20.tex-23"
 (run* (r)
   (>1o r))
 
-(list 
+(list
 `(_.0 _.1 . _.2)
 ))
 
@@ -2825,19 +2825,19 @@
       (addero e x y z))))
 
 
-(test-check "testc20.tex-24" 
+(test-check "testc20.tex-24"
 (run3 (s)
   (fresh (x y r)
     (addero 0 x y r)
     (== `(,x ,y ,r) s)))
-  
+
 
 `((_.0 () _.0)
  (() (_.0 . _.1) (_.0 . _.1))
  ((1) (1) (0 1)))
  )
 
-(test-check "testc20.tex-25" 
+(test-check "testc20.tex-25"
 (run22 (s)
   (fresh (x y r)
     (addero 0 x y r)
@@ -2870,13 +2870,13 @@
 
 
 
-(test-check "testc20.tex-26" 
+(test-check "testc20.tex-26"
 (run* (s)
   (gen-addero 1 '(0 1 1) '(1 1) s))
 
 (list `(0 1 0 1)))
 
-(test-check "testc20.tex-27" 
+(test-check "testc20.tex-27"
 (run* (s)
   (fresh (x y)
     (addero 0 x y '(1 0 1))
@@ -2908,7 +2908,7 @@
     (== `(,x ,y) s)))
 
 
-(test-check "testc20.tex-28" 
+(test-check "testc20.tex-28"
 (run* (s)
   (fresh (x y)
     (pluso x y '(1 0 1))
@@ -2928,7 +2928,7 @@
     (pluso m k n)))
 
 
-(test-check "testc20.tex-29" 
+(test-check "testc20.tex-29"
 (run* (q)
   (minuso '(0 0 0 1) '(1 0 1) q))
 
@@ -2936,7 +2936,7 @@
 `((1 1))
 )
 
-(test-check "testc20.tex-30" 
+(test-check "testc20.tex-30"
 (run* (q)
   (minuso '(0 1 1) '(0 1 1) q))
 
@@ -2944,7 +2944,7 @@
 `(())
 )
 
-(test-check "testc20.tex-31" 
+(test-check "testc20.tex-31"
 (run* (q)
   (minuso '(0 1 1) '(0 0 0 1) q))
 
@@ -2957,8 +2957,8 @@
   (lambda (n m p)
     (conde
       ((== '() n) (== '() p))
-      ((poso n) (== '() m) (== '() p))  
-      ((== '(1) n) (poso m) (== m p))   
+      ((poso n) (== '() m) (== '() p))
+      ((== '(1) n) (poso m) (== m p))
       ((>1o n) (== '(1) m) (== n p))
       ((fresh (x z)
          (== `(0 . ,x) n) (poso x)
@@ -2970,7 +2970,7 @@
          (== `(0 . ,y) m) (poso y)
          (*o m n p)))
       ((fresh (x y)
-         (== `(1 . ,x) n) (poso x)      
+         (== `(1 . ,x) n) (poso x)
          (== `(1 . ,y) m) (poso y)
          (odd-*o x n m p))))))
 
@@ -2992,11 +2992,11 @@
            ((nullo n)
             (cdro m z)
             (bound-*o x y z '()))
-           ((cdro n z) 
+           ((cdro n z)
             (bound-*o x y z m))))))))
 
 
-(test-check "testc21.tex-1" 
+(test-check "testc21.tex-1"
 (run34 (t)
   (fresh (x y r)
     (*o x y r)
@@ -3039,9 +3039,9 @@
  ((1 1) (1 0 0 1) (1 1 0 1 1)))
 )
 
-(test-check "testc21.tex-2" 
+(test-check "testc21.tex-2"
 (run* (p)
-  (*o '(0 1) '(0 0 1) p))  
+  (*o '(0 1) '(0 0 1) p))
 
 (list `(0 0 0 1)))
 
@@ -3052,14 +3052,14 @@
     succeed))
 
 
-(test-check "testc21.tex-3" 
+(test-check "testc21.tex-3"
 (run1 (t)
   (fresh (n m)
     (*o n m '(1))
     (== `(,n ,m) t)))
 
 (list `((1) (1))))
-(define e (make-engine (lambda () 
+(define e (make-engine (lambda ()
 (run2 (t)
   (fresh (n m)
     (*o n m '(1))
@@ -3083,12 +3083,12 @@
            ((nullo n)
             (cdro m z)
             (bound-*o x y z '()))
-           ((cdro n z) 
+           ((cdro n z)
             (bound-*o x y z m))))))))
 
 
 
-(test-check "testc21.tex-5" 
+(test-check "testc21.tex-5"
 (run2 (t)
   (fresh (n m)
     (*o n m '(1))
@@ -3096,7 +3096,7 @@
 
 `(((1) (1))))
 
-(test-check "testc21.tex-6" 
+(test-check "testc21.tex-6"
 (run* (p)
   (*o '(1 1 1) '(1 1 1 1 1 1) p))
 
@@ -3113,7 +3113,7 @@
          (=lo x y))))))
 
 
-(test-check "testc21.tex-7" 
+(test-check "testc21.tex-7"
 (run* (t)
   (fresh (w x y)
     (=lo `(1 ,w ,x . ,y) '(0 1 1 0 1))
@@ -3121,21 +3121,21 @@
 
 (list `(_.0 _.1 (_.2 1))))
 
-(test-check "testc21.tex-8" 
+(test-check "testc21.tex-8"
 (run* (b)
   (=lo '(1) `(,b)))
 
 (list 1))
 
-(test-check "testc21.tex-9" 
+(test-check "testc21.tex-9"
 (run* (n)
   (=lo `(1 0 1 . ,n) '(0 1 1 0 1)))
 
-(list 
+(list
 `(_.0 1)
 ))
 
-(test-check "testc21.tex-10" 
+(test-check "testc21.tex-10"
 (run5 (t)
   (fresh (y z)
     (=lo `(1 . ,y) `(1 . ,z))
@@ -3149,7 +3149,7 @@
  ((_.0 _.1 _.2 1) (_.3 _.4 _.5 1)))
 )
 
-(test-check "testc21.tex-11" 
+(test-check "testc21.tex-11"
 (run5 (t)
   (fresh (y z)
     (=lo `(1 . ,y) `(0 . ,z))
@@ -3163,7 +3163,7 @@
  ((_.0 _.1 _.2 _.3 1) (_.4 _.5 _.6 _.7 1)))
 )
 
-(test-check "testc21.tex-12" 
+(test-check "testc21.tex-12"
 (run5 (t)
   (fresh (y z)
     (=lo `(1 . ,y) `(0 1 1 0 1 . ,z))
@@ -3188,7 +3188,7 @@
          (<lo x y))))))
 
 
-(test-check "testc21.tex-13" 
+(test-check "testc21.tex-13"
 (run8 (t)
   (fresh (y z)
     (<lo `(1 . ,y) `(0 1 1 0 1 . ,z))
@@ -3204,7 +3204,7 @@
  ((_.0 _.1 _.2 _.3 _.4 1) (_.5 _.6 _.7 . _.8))
  ((_.0 _.1 _.2 _.3 _.4 _.5 1) (_.6 _.7 _.8 _.9 . _.10)))
 )
-(define e (make-engine (lambda () 
+(define e (make-engine (lambda ()
 (run1 (n)
   (<lo n n))
 )))
@@ -3221,7 +3221,7 @@
       ((<lo n m)))))
 
 
-(test-check "testc21.tex-15" 
+(test-check "testc21.tex-15"
 (run8 (t)
   (fresh (n m)
     (<=lo n m)
@@ -3238,7 +3238,7 @@
  ((_.0 _.1 _.2 1) (_.3 _.4 _.5 1)))
 )
 
-(test-check "testc21.tex-16" 
+(test-check "testc21.tex-16"
 (run1 (t)
   (fresh (n m)
     (<=lo n m)
@@ -3247,7 +3247,7 @@
 
 (list `(() ())))
 
-(test-check "testc21.tex-17" 
+(test-check "testc21.tex-17"
 (run10 (t)
   (fresh (n m)
     (<=lo n m)
@@ -3267,7 +3267,7 @@
  ((0 0 0 1) (0 0 0 0 1)))
 )
 
-(test-check "testc21.tex-18" 
+(test-check "testc21.tex-18"
 (run15 (t)
   (fresh (n m)
     (<=lo n m)
@@ -3308,21 +3308,21 @@
       ((<o n m)))))
 
 
-(test-check "testc21.tex-19" 
+(test-check "testc21.tex-19"
 (run* (q)
   (<o '(1 0 1) '(1 1 1))
   (== #t q))
 
 (list #t))
 
-(test-check "testc21.tex-20" 
+(test-check "testc21.tex-20"
 (run* (q)
   (<o '(1 1 1) '(1 0 1))
   (== #t q))
 
 `())
 
-(test-check "testc21.tex-21" 
+(test-check "testc21.tex-21"
 (run* (q)
   (<o '(1 0 1) '(1 0 1))
   (== #t q))
@@ -3336,7 +3336,7 @@
 
 `(#t))
 
-(test-check "testc21.tex-22" 
+(test-check "testc21.tex-22"
 (run6 (n)
   (<o n `(1 0 1)))
 
@@ -3344,14 +3344,14 @@
 `(() (1) (_.0 1) (0 0 1))
 )
 
-(test-check "testc21.tex-23" 
+(test-check "testc21.tex-23"
 (run6 (m)
   (<o `(1 0 1) m))
 
 
 `((_.0 _.1 _.2 _.3 . _.4) (0 1 1) (1 1 1))
 )
-(define e (make-engine (lambda () 
+(define e (make-engine (lambda ()
 (run* (n)
   (<o n n))
 )))
@@ -3368,9 +3368,9 @@
       ((== r n) (== '() q) (<o n m))
       ((== '(1) q) (=lo n m) (pluso r m n)
        (<o r m))
-      ((<lo m n)                        
-       (<o r m)                        
-       (poso q)                 
+      ((<lo m n)
+       (<o r m)
+       (poso q)
        (fresh (nh nl qh ql qlm qlmr rr rh)
          (splito n r nl nh)
          (splito q r ql qh)
@@ -3418,7 +3418,7 @@
          (splito n^ r^ l^ h))))))
 
 
-(test-check "testc21.tex-25" 
+(test-check "testc21.tex-25"
 (run6 (t)
   (fresh (n m q r)
     (/o n m q r)
@@ -3442,13 +3442,13 @@
     (conde
       ((== '() q) (== n r) (<o n m))
       ((== '(1) q) (== '() r) (== n m)
-       (<o r m))      
+       (<o r m))
       ((<o m n) (<o r m)
        (fresh (mq)
          (<=lo mq n)
          (*o m q mq)
          (pluso mq r n))))))
-  
+
 
 
   (define /otest1
@@ -3476,9 +3476,9 @@
       ((== r n) (== '() q) (<o n m))
       ((== '(1) q) (=lo n m) (pluso r m n)
        (<o r m))
-      ((<lo m n)                        
-       (<o r m)                        
-       (poso q)                 
+      ((<lo m n)
+       (<o r m)
+       (poso q)
        (fresh (nh nl qh ql qlm qlmr rr rh)
          (splito n r nl nh)
          (splito q r ql qh)
@@ -3607,8 +3607,8 @@
          (*o nq1 n nq))))))
 
 
-(test-check "testc21.tex-26" 
-(run* (r) 
+(test-check "testc21.tex-26"
+(run* (r)
   (logo '(0 1 1 1) '(0 1) '(1 1) r))
 
 (list `(0 1 1)))
@@ -3617,7 +3617,7 @@
  '(printf "This next test takes several minutes to run!\n")
 
 
-'(test-check "testc21.tex-27" 
+'(test-check "testc21.tex-27"
 (run9 (s)
   (fresh (b q r)
     (logo '(0 0 1 0 0 0 1) b q r)
@@ -3641,120 +3641,120 @@
     (logo n b q '())))
 
 
-'(test-check "testc21.tex-28" 
+'(test-check "testc21.tex-28"
 (run* (t)
   (expo '(1 1) '(1 0 1) t))
 
 (list `(1 1 0 0 1 1 1 1)))
 
  (define u (var 'u))
- 
+
  (define v (var 'v))
- 
+
  (define w (var 'w))
- 
+
 
  (define x (var 'x))
- 
- (define y (var 'y))
- 
- (define z (var 'z))
- 
 
-(test-check "testc22.tex-1"   
+ (define y (var 'y))
+
+ (define z (var 'z))
+
+
+(test-check "testc22.tex-1"
 (rhs `(,z . b))
 
 'b)
 
-(test-check "testc22.tex-2"   
+(test-check "testc22.tex-2"
 (rhs `(,z . ,w))
 
 w)
 
-(test-check "testc22.tex-3" 
+(test-check "testc22.tex-3"
 (rhs `(,z . (,x e ,y)))
 
 `(,x e ,y))
 
 
-(test-check "testc22.tex-4" 
+(test-check "testc22.tex-4"
 (walk z (S->s `((,z . a) (,x . ,w) (,y . ,z))))
 
 'a)
 
-(test-check "testc22.tex-5"   
+(test-check "testc22.tex-5"
 (walk y (S->s `((,z . a) (,x . ,w) (,y . ,z))))
 
 'a)
 
-(test-check "testc22.tex-6"   
+(test-check "testc22.tex-6"
 (walk x (S->s `((,z . a) (,x . ,w) (,y . ,z))))
 
 w)
 
-(test-check "testc22.tex-7"   
+(test-check "testc22.tex-7"
 (walk w (S->s `((,z . a) (,x . ,w) (,y . ,z))))
 
 w)
 
-(test-check "testc22.tex-8"   
+(test-check "testc22.tex-8"
 (walk u (S->s `((,x . b) (,w . (,x e ,x)) (,u . ,w))))
 
 `(,x e ,x))
 
 
-(test-check "testc22.tex-9" 
+(test-check "testc22.tex-9"
 (walk y (ext-s x 'e (S->s `((,z . ,x) (,y . ,z)))))
 
 'e)
 
-(test-check "testc22.tex-10"                                                    
+(test-check "testc22.tex-10"
 (walk y (S->s `((,x . e))))
 
 y)
 
-(test-check "testc22.tex-11"   
+(test-check "testc22.tex-11"
 (walk x (S->s `((,y . ,z) (,x . ,y))))
 
 z)
 
-(test-check "testc22.tex-12"   
+(test-check "testc22.tex-12"
 (walk x (ext-s y z (S->s `((,x . ,y)))))
 
 z)
 
-(test-check "testc22.tex-13" 
+(test-check "testc22.tex-13"
 (walk x (ext-s z 'b (S->s `((,y . ,z) (,x . ,y)))))
 
 'b)
 
-(test-check "testc22.tex-14" 
+(test-check "testc22.tex-14"
 (walk x (ext-s z w (S->s `((,y . ,z) (,x . ,y)))))
 
 w)
 
 
-(test-check "testc22.tex-15" 
-(occurs-check z u 
+(test-check "testc22.tex-15"
+(occurs-check z u
   (S->s `((,x . (a ,y)) (,w . (,x e ,x)) (,u . ,w) (,y . (,z)))))
 
 #t)
 
 
 
-(test-check "testc22.tex-16"   
+(test-check "testc22.tex-16"
 (walk* x
   (S->s `((,y . (a ,z c)) (,x . ,y) (,z . a))))
 
 `(a a c))
 
-(test-check "testc22.tex-17" 
+(test-check "testc22.tex-17"
 (walk* x
   (S->s `((,y . (,z ,w c)) (,x . ,y) (,z . a))))
 
 `(a ,w c))
 
-(test-check "testc22.tex-18" 
+(test-check "testc22.tex-18"
 (walk* y
   (S->s `((,y . (,w ,z c)) (,v . b) (,x . ,v) (,z . ,x))))
 
@@ -3762,7 +3762,7 @@ w)
 
 
 
-(test-check "testc22.tex-19" 
+(test-check "testc22.tex-19"
 (run* (q)
   (== #f q)
   (project (q)
@@ -3772,26 +3772,26 @@ w)
 
 
 
-(test-check "testc22.tex-20" 
+(test-check "testc22.tex-20"
 (let ((r (walk* `(,x ,y ,z) empty-s)))
   (walk* r (reify-s r empty-s)))
 
 `(_.0 _.1 _.2))
 
-(test-check "testc22.tex-21" 
+(test-check "testc22.tex-21"
 (let ((r `(,u (,v (,w ,x) ,y) ,x)))
   (walk* r (reify-s r empty-s)))
 
 `(_.0 (_.1 (_.2 _.3) _.4) _.3))
 
-(test-check "testc22.tex-22" 
+(test-check "testc22.tex-22"
 (let ((s (S->s `((,y . (,z ,w c ,w)) (,x . ,y) (,z . a)))))
   (let ((r (walk* x s)))
     (walk* r (reify-s r empty-s))))
 
 `(a _.0 c _.0))
 
-(test-check "testc22.tex-23" 
+(test-check "testc22.tex-23"
 (let ((s (S->s `((,y . (,z ,w c ,w)) (,x . ,y) (,z . ,u)))))
   (let ((r (walk* x s)))
     (walk* r (reify-s r empty-s))))
@@ -3799,13 +3799,13 @@ w)
 `(_.0 _.1 c _.1))
 
 
-(test-check "testc22.tex-24" 
+(test-check "testc22.tex-24"
 (let ((s (S->s `((,y . (,z ,w c ,w)) (,x . ,y) (,z . a)))))
   (reify x s))
 
 `(a _.0 c _.0))
-(define e (make-engine (lambda ()   
-(run1 (x) 
+(define e (make-engine (lambda ()
+(run1 (x)
   (== `(,x) x))
 )))
 (printf "Testing testc22.tex-25  (engine with ~s ticks fuel)\n" max-ticks)
@@ -3813,12 +3813,12 @@ w)
 (lambda (t v) (error 'testc22.tex-25 "infinite loop returned ~s after ~s ticks" v (- max-ticks t)))
 (lambda (e^) (void)))
 
-(test-check "testc22.tex-28"   
-(run1 (x) 
+(test-check "testc22.tex-28"
+(run1 (x)
   (== `(,x) x))
 
 `())
-(define e (make-engine (lambda () 
+(define e (make-engine (lambda ()
 (run1 (x)
   (fresh (y z)
     (== x z)
@@ -3831,14 +3831,14 @@ w)
 (lambda (e^) (void)))
 
 
-(test-check "testc22.tex-30" 
+(test-check "testc22.tex-30"
 (run1 (x)
   (fresh (y z)
     (== x z)
     (== `(a b ,z) y)
     (== x y)))
 `())
-(define e (make-engine (lambda ()   
+(define e (make-engine (lambda ()
 (run1 (x)
   (== `(,x) x))
 )))
@@ -3849,18 +3849,18 @@ w)
 
 
     (test-check "testc23.tex-fail1" (run* (q)
-  
 
-(conda 
-  (fail succeed) 
-  (fail)) 
+
+(conda
+  (fail succeed)
+  (fail))
 
 
     ) '())
-  
+
 
     (test-check "testc23.tex-succeed1" (not (null? (run* (q)
-  
+
 
 (conda
   (fail succeed)
@@ -3868,10 +3868,10 @@ w)
 
 
     ))) #t)
-  
+
 
     (test-check "testc23.tex-succeed1" (not (null? (run* (q)
-  
+
 
 (conda
   (succeed fail)
@@ -3879,10 +3879,10 @@ w)
 
 
     ))) #f)
-  
+
 
     (test-check "testc23.tex-succeed2" (not (null? (run* (q)
-  
+
 
 (conda
   (succeed succeed)
@@ -3890,9 +3890,9 @@ w)
 
 
     ))) #t)
-  
 
-(test-check "testc23.tex-1" 
+
+(test-check "testc23.tex-1"
 (run* (x)
   (conda
     ((== 'olive x) succeed)
@@ -3900,7 +3900,7 @@ w)
 
 `(olive))
 
-(test-check "testc23.tex-2" 
+(test-check "testc23.tex-2"
 (run* (x)
   (conda
     ((== 'virgin x) fail)
@@ -3909,7 +3909,7 @@ w)
 
 `())
 
-(test-check "testc23.tex-3" 
+(test-check "testc23.tex-3"
 (run* (q)
   (fresh (x y)
     (== 'split x)
@@ -3921,7 +3921,7 @@ w)
 
 `())
 
-(test-check "testc23.tex-4" 
+(test-check "testc23.tex-4"
 (run* (q)
   (fresh (x y)
     (== 'split x)
@@ -3932,31 +3932,31 @@ w)
   (== #t q))
 
 (list #t))
-                                                 
+
 (define notpastao
-  (lambda (x)                                                                   
-    (conda                                                                      
-      ((== 'pasta x) fail)                             
-      (succeed))))                                                         
+  (lambda (x)
+    (conda
+      ((== 'pasta x) fail)
+      (succeed))))
 
 
-(test-check "testc23.tex-5"     
-(run* (x) 
+(test-check "testc23.tex-5"
+(run* (x)
   (conda
     ((notpastao x) fail)
     ((== 'spaghetti x))))
 
 '(spaghetti))
 
-(test-check "testc23.tex-6" 
-(run* (x)                                                                       
-  (== 'spaghetti x)  
+(test-check "testc23.tex-6"
+(run* (x)
+  (== 'spaghetti x)
   (conda
     ((notpastao x) fail)
     ((== 'spaghetti x))))
 
 '())
-(define e (make-engine (lambda () 
+(define e (make-engine (lambda ()
 (run* (q)
   (conda
     (always succeed)
@@ -3969,7 +3969,7 @@ w)
 (lambda (e^) (void)))
 
 
-(test-check "testc23.tex-8" 
+(test-check "testc23.tex-8"
 (run* (q)
   (condu
     (always succeed)
@@ -3977,7 +3977,7 @@ w)
   (== #t q))
 
 `(#t))
-(define e (make-engine (lambda () 
+(define e (make-engine (lambda ()
 (run* (q)
   (condu
     (succeed always)
@@ -3989,11 +3989,11 @@ w)
 (lambda (t v) (error 'testc23.tex-9 "infinite loop returned ~s after ~s ticks" v (- max-ticks t)))
 (lambda (e^) (void)))
 
-(define e (make-engine (lambda ()   
+(define e (make-engine (lambda ()
 (run1 (q)
   (conda
     (always succeed)
-    (fail)) 
+    (fail))
   fail
   (== #t q))
 )))
@@ -4003,11 +4003,11 @@ w)
 (lambda (e^) (void)))
 
 
-(test-check "testc23.tex-11"   
+(test-check "testc23.tex-11"
 (run1 (q)
   (condu
     (always succeed)
-    (fail)) 
+    (fail))
   fail
   (== #t q))
 
@@ -4019,20 +4019,20 @@ w)
       (g succeed))))
 
 
-(test-check "testc23.tex-12" 
+(test-check "testc23.tex-12"
 (run* (x)
   (onceo (teacupo x)))
 
 `(tea))
 
-(test-check "testc23.tex-13" 
+(test-check "testc23.tex-13"
 (run1 (q)
   (onceo (salo never))
   fail)
 
 `())
 
-(test-check "testc23.tex-14"   
+(test-check "testc23.tex-14"
 (run* (r)
   (conde
     ((teacupo r) succeed)
@@ -4040,7 +4040,7 @@ w)
 
 `(#f tea cup))
 
-(test-check "testc23.tex-15"   
+(test-check "testc23.tex-15"
 (run* (r)
   (conda
     ((teacupo r) succeed)
@@ -4048,7 +4048,7 @@ w)
 
 `(tea cup))
 
-(test-check "testc23.tex-16" 
+(test-check "testc23.tex-16"
 (run* (r)
   (== #f r)
   (conda
@@ -4057,7 +4057,7 @@ w)
 
 `(#f))
 
-(test-check "testc23.tex-17"   
+(test-check "testc23.tex-17"
 (run* (r)
   (== #f r)
   (condu
@@ -4075,7 +4075,7 @@ w)
          (bumpo m x))))))
 
 
-(test-check "testc23.tex-18" 
+(test-check "testc23.tex-18"
 (run* (x)
   (bumpo '(1 1 1) x))
 
@@ -4100,15 +4100,15 @@ w)
         (== k z)))))
 
 
-(test-check "testc23.tex-19" 
+(test-check "testc23.tex-19"
 (run* (q)
   (gen&testo pluso '(0 0 1) '(1 1) '(1 1 1))
   (== #t q))
 
-(list 
+(list
 #t
 ))
-(define e (make-engine (lambda () 
+(define e (make-engine (lambda ()
 (run1 (q)
   (gen&testo pluso '(0 0 1) '(1 1) '(0 1 1)))
 )))
@@ -4117,7 +4117,7 @@ w)
 (lambda (t v) (error 'testc23.tex-20 "infinite loop returned ~s after ~s ticks" v (- max-ticks t)))
 (lambda (e^) (void)))
 
-(define e (make-engine (lambda () 
+(define e (make-engine (lambda ()
 (run1 (q)
   (gen&testo pluso '(0 0 1) '(1 1) '(0 1 1)))
 )))
@@ -4137,7 +4137,7 @@ w)
       (== `(,i ,j ,k) r))))
 
 
-(test-check "testc23.tex-22" 
+(test-check "testc23.tex-22"
 (run* (s)
   (enumerateo pluso s '(1 1)))
 
@@ -4164,7 +4164,7 @@ w)
   (enumerateo pluso s '(1 1)))
 
 
-'(test-check "testc23.tex-23" 
+'(test-check "testc23.tex-23"
 (run1 (s)
   (enumerateo pluso s '(1 1 1)))
 
@@ -4215,18 +4215,18 @@ w)
   '(_.0))
 
 (test-check 'why-conde-must-also-have-an-inc
-  ((make-engine 
-     (lambda () 
-       (run 5 (q) 
-         (letrec ((f (fresh () 
-                       (conde 
-                         (f (conde 
-                              (f) 
-                              (succeed))) 
-                         (succeed))))) 
-           f)))) 
-   100000 
-   (lambda (x y) y) 
+  ((make-engine
+     (lambda ()
+       (run 5 (q)
+         (letrec ((f (fresh ()
+                       (conde
+                         (f (conde
+                              (f)
+                              (succeed)))
+                         (succeed)))))
+           f))))
+   100000
+   (lambda (x y) y)
    list)
   '(_.0 _.0 _.0 _.0 _.0))
 
