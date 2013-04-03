@@ -1,0 +1,25 @@
+X={x\X}.
+% X = {x\_1}
+% Constraint: set(_1)
+
+X={x\X} & X={y\X}.
+% 4 times
+% X = {x,y\_1}
+% Constraint: set(_1)
+
+{X\R}={Y\S}.
+% Y = X,  
+% S = R
+% Constraint: set(R)
+%
+% R = {X\S},  
+% Y = X
+% Constraint: set(S)
+%
+% Y = X,  
+% S = {X\R}
+% Constraint: set(R)
+%
+% R = {Y\_G682},  
+% S = {X\_G682}
+% Constraint: set(_G682)
