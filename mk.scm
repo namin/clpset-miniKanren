@@ -32,14 +32,17 @@
 
 (define s->S (lambda (s) (car s)))
 (define s->C (lambda (s) (cadr s)))
+(define C->set (lambda (C) (car C)))
 (define S->s (lambda (S) (with-S empty-s S)))
 (define with-S (lambda (s S) (list S (s->C s))))
-(define empty-s '(() ()))
+(define with-C (lambda (s C) (list (s->S s) C)))
+(define with-C-set (lambda (C cs) (list cs)))
+(define empty-s '(() (())))
 
 (define empty-set '#())
 (define empty-set? (lambda (x) (and (vector? x) (= (vector-length x) 0))))
 (define non-empty-set? (lambda (x) (and (vector? x) (> (vector-length x) 1))))
-(define set? (lambda (x) (and (empty-set? x) (non-empty-set? x))))
+(define set? (lambda (x) (or (empty-set? x) (non-empty-set? x))))
 (define join
   (lambda (a b)
     (cond
@@ -95,7 +98,31 @@
 (define non-empty-set-size
   (lambda (x)
     (- (vector-length x) 1)))
-(define setc (lambda (x) succeed)) ;; TODO
+(define setc
+  (lambda (x)
+    (lambda (s)
+      (with-C s (with-C-set (s->C s) (join `(,x) (C->set (s->C s))))))))
+(define tagged-list?
+  (lambda (tag lst)
+    (and (list? lst) (not (null? lst)) (eq? tag (car lst)))))
+
+(define constraints-set-check
+  (lambda (Cset)
+    (lambda (s)
+      (let loop ((Cset Cset) (solved-set '()) (s s))
+        (if (null? Cset)
+          (with-C s (with-C-set (s->C s) solved-set))
+          (let ((v (car Cset)))
+            (cond
+              ((var? v) (loop (cdr Cset) (cons v solved-set) s))
+              ((empty-set? v) (loop (cdr Cset) solved-set s))
+              ((non-empty-set? v) (loop (cons (vector-ref v 0) (cdr Cset)) solved-set s))
+              (else #f))))))))
+(define run-constraints
+  (lambda (s)
+    (let* ((C (walk* (s->C s) s))
+           (s (with-C s C)))
+      ((constraints-set-check (C->set C)) s))))
 
 (define walk
   (lambda (u s)
@@ -106,7 +133,7 @@
 
 (define ext-s
   (lambda (x v s)
-    (with-S s (cons `(,x . ,v) (s->S s)))))
+    (run-constraints (with-S s (cons `(,x . ,v) (s->S s))))))
 
 (define ext-s-check
   (lambda (x v s)
@@ -158,10 +185,23 @@
     (string->symbol
       (string-append "_" "." (number->string n)))))
 
+(define reify-constraints
+  (lambda (s r)
+    (let* ((C (s->C s))
+           (Cset (filter (lambda (x) (not (var? x))) (map (lambda (x) (walk x r)) (C->set C)))))
+      (if (null? Cset)
+        '()
+        (map (lambda (x) (list 'set x)) (join Cset '()))))))
 (define reify
   (lambda (v s)
-    (let ((v (walk* v s)))
-      (walk* v (reify-s v empty-s)))))
+    (let* ((s (run-constraints s))
+           (v (walk* v s))
+           (r (reify-s v empty-s))
+           (vr (walk* v r))
+           (Cr (filter (lambda (id) id) (reify-constraints s r))))
+      (if (null? Cr)
+        vr
+        `(,vr : ,@Cr)))))
 
 (define-syntax mzero
   (syntax-rules () ((_) #f)))
@@ -350,7 +390,7 @@
                                  (setc n)))
                               ((loopj (+ j 1)))))
                           fail))) s))))
-              (else (fail s)))))
+              (else #f))))
         ((and (pair? u) (pair? v))
          (let ((s (unify
                     (car u) (car v) s)))
