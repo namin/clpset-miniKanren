@@ -3678,65 +3678,65 @@ w)
 
 
 (test-check "testc22.tex-4" 
-(walk z `((,z . a) (,x . ,w) (,y . ,z)))
+(walk z (S->s `((,z . a) (,x . ,w) (,y . ,z))))
 
 'a)
 
 (test-check "testc22.tex-5"   
-(walk y `((,z . a) (,x . ,w) (,y . ,z)))
+(walk y (S->s `((,z . a) (,x . ,w) (,y . ,z))))
 
 'a)
 
 (test-check "testc22.tex-6"   
-(walk x `((,z . a) (,x . ,w) (,y . ,z)))
+(walk x (S->s `((,z . a) (,x . ,w) (,y . ,z))))
 
 w)
 
 (test-check "testc22.tex-7"   
-(walk w `((,z . a) (,x . ,w) (,y . ,z)))
+(walk w (S->s `((,z . a) (,x . ,w) (,y . ,z))))
 
 w)
 
 (test-check "testc22.tex-8"   
-(walk u `((,x . b) (,w . (,x e ,x)) (,u . ,w)))
+(walk u (S->s `((,x . b) (,w . (,x e ,x)) (,u . ,w))))
 
 `(,x e ,x))
 
 
 (test-check "testc22.tex-9" 
-(walk y (ext-s x 'e `((,z . ,x) (,y . ,z))))
+(walk y (ext-s x 'e (S->s `((,z . ,x) (,y . ,z)))))
 
 'e)
 
 (test-check "testc22.tex-10"                                                    
-(walk y `((,x . e)))                                                            
+(walk y (S->s `((,x . e))))
 
 y)
 
 (test-check "testc22.tex-11"   
-(walk x `((,y . ,z) (,x . ,y)))
+(walk x (S->s `((,y . ,z) (,x . ,y))))
 
 z)
 
 (test-check "testc22.tex-12"   
-(walk x (ext-s y z `((,x . ,y))))
+(walk x (ext-s y z (S->s `((,x . ,y)))))
 
 z)
 
 (test-check "testc22.tex-13" 
-(walk x (ext-s z 'b `((,y . ,z) (,x . ,y))))
+(walk x (ext-s z 'b (S->s `((,y . ,z) (,x . ,y)))))
 
 'b)
 
 (test-check "testc22.tex-14" 
-(walk x (ext-s z w `((,y . ,z) (,x . ,y))))
+(walk x (ext-s z w (S->s `((,y . ,z) (,x . ,y)))))
 
 w)
 
 
 (test-check "testc22.tex-15" 
 (occurs-check z u 
-  `((,x . (a ,y)) (,w . (,x e ,x)) (,u . ,w) (,y . (,z))))
+  (S->s `((,x . (a ,y)) (,w . (,x e ,x)) (,u . ,w) (,y . (,z)))))
 
 #t)
 
@@ -3744,19 +3744,19 @@ w)
 
 (test-check "testc22.tex-16"   
 (walk* x
-  `((,y . (a ,z c)) (,x . ,y) (,z . a)))
+  (S->s `((,y . (a ,z c)) (,x . ,y) (,z . a))))
 
 `(a a c))
 
 (test-check "testc22.tex-17" 
 (walk* x
-  `((,y . (,z ,w c)) (,x . ,y) (,z . a)))
+  (S->s `((,y . (,z ,w c)) (,x . ,y) (,z . a))))
 
 `(a ,w c))
 
 (test-check "testc22.tex-18" 
 (walk* y
-  `((,y . (,w ,z c)) (,v . b) (,x . ,v) (,z . ,x)))
+  (S->s `((,y . (,w ,z c)) (,v . b) (,x . ,v) (,z . ,x))))
 
 `(,w b c))
 
@@ -3785,14 +3785,14 @@ w)
 `(_.0 (_.1 (_.2 _.3) _.4) _.3))
 
 (test-check "testc22.tex-22" 
-(let ((s `((,y . (,z ,w c ,w)) (,x . ,y) (,z . a))))
+(let ((s (S->s `((,y . (,z ,w c ,w)) (,x . ,y) (,z . a)))))
   (let ((r (walk* x s)))
     (walk* r (reify-s r empty-s))))
 
 `(a _.0 c _.0))
 
 (test-check "testc22.tex-23" 
-(let ((s `((,y . (,z ,w c ,w)) (,x . ,y) (,z . ,u))))
+(let ((s (S->s `((,y . (,z ,w c ,w)) (,x . ,y) (,z . ,u)))))
   (let ((r (walk* x s)))
     (walk* r (reify-s r empty-s))))
 
@@ -3800,7 +3800,7 @@ w)
 
 
 (test-check "testc22.tex-24" 
-(let ((s `((,y . (,z ,w c ,w)) (,x . ,y) (,z . a))))
+(let ((s (S->s `((,y . (,z ,w c ,w)) (,x . ,y) (,z . a)))))
   (reify x s))
 
 `(a _.0 c _.0))

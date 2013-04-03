@@ -1,3 +1,8 @@
+(define s->S (lambda (s) (car s)))
+(define S->s (lambda (S) (with-S empty-s S)))
+(define with-S (lambda (s S) (list S)))
+(define empty-s '(()))
+
 (define-syntax lambdag@
   (syntax-rules ()
     ((_ (p) e) (lambda (p) e))))
@@ -18,9 +23,9 @@
   (syntax-rules ()
     ((_ x) (car x))))
 
-(define-syntax size-s
+(define-syntax size-S
   (syntax-rules ()
-    ((_ x) (length x))))
+    ((_ x) (length (s->S x)))))
 
 (define-syntax var
   (syntax-rules ()
@@ -30,18 +35,16 @@
   (syntax-rules ()
     ((_ x) (vector? x))))
 
-(define empty-s '())
-
 (define walk
-  (lambda (u S)
+  (lambda (u s)
     (cond
-      ((and (var? u) (assq u S)) =>
-       (lambda (pr) (walk (rhs pr) S)))
+      ((and (var? u) (assq u (s->S s))) =>
+       (lambda (pr) (walk (rhs pr) s)))
       (else u))))
 
 (define ext-s
   (lambda (x v s)
-    (cons `(,x . ,v) s)))
+    (with-S s (cons `(,x . ,v) (s->S s)))))
 
 (define unify
   (lambda (u v s)
@@ -92,7 +95,7 @@
     (let ((v (walk v s)))
       (cond
         ((var? v)
-         (ext-s v (reify-name (size-s s)) s))
+         (ext-s v (reify-name (size-S s)) s))
         ((pair? v) (reify-s (cdr v)
                      (reify-s (car v) s)))
         (else s)))))
