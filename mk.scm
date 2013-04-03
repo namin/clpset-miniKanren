@@ -1,3 +1,35 @@
+(define-syntax lambdag@
+  (syntax-rules ()
+    ((_ (p) e) (lambda (p) e))))
+
+(define-syntax lambdaf@
+  (syntax-rules ()
+    ((_ () e) (lambda () e))))
+
+(define-syntax run*
+  (syntax-rules ()
+    ((_ (x) g ...) (run #f (x) g ...))))
+
+(define-syntax rhs
+  (syntax-rules ()
+    ((_ x) (cdr x))))
+
+(define-syntax lhs
+  (syntax-rules ()
+    ((_ x) (car x))))
+
+(define-syntax size-S
+  (syntax-rules ()
+    ((_ x) (length (s->S x)))))
+
+(define-syntax var
+  (syntax-rules ()
+    ((_ x) (vector x))))
+
+(define-syntax var?
+  (syntax-rules ()
+    ((_ x) (and (vector? x) (= (vector-length x) 1)))))
+
 (define s->S (lambda (s) (car s)))
 (define s->C (lambda (s) (cadr s)))
 (define S->s (lambda (S) (with-S empty-s S)))
@@ -65,38 +97,6 @@
     (- (vector-length x) 1)))
 (define setc (lambda (x) succeed)) ;; TODO
 
-(define-syntax lambdag@
-  (syntax-rules ()
-    ((_ (p) e) (lambda (p) e))))
-
-(define-syntax lambdaf@
-  (syntax-rules ()
-    ((_ () e) (lambda () e))))
-
-(define-syntax run*
-  (syntax-rules ()
-    ((_ (x) g ...) (run #f (x) g ...))))
-
-(define-syntax rhs
-  (syntax-rules ()
-    ((_ x) (cdr x))))
-
-(define-syntax lhs
-  (syntax-rules ()
-    ((_ x) (car x))))
-
-(define-syntax size-S
-  (syntax-rules ()
-    ((_ x) (length (s->S x)))))
-
-(define-syntax var
-  (syntax-rules ()
-    ((_ x) (vector x))))
-
-(define-syntax var?
-  (syntax-rules ()
-    ((_ x) (and (vector? x) (= (vector-length x) 1)))))
-
 (define walk
   (lambda (u s)
     (cond
@@ -107,65 +107,6 @@
 (define ext-s
   (lambda (x v s)
     (with-S s (cons `(,x . ,v) (s->S s)))))
-
-(define unify
-  (lambda (ou ov s)
-    (let ((u (walk ou s))
-          (v (walk ov s)))
-      (cond
-        ((and (var? v) (not (var? u))) (unify ov ou s))
-        ((eq? u v) s)
-        ((and (var? u) (not (occurs-check u v s))) (ext-s u v s))
-        ((non-empty-set? v)
-          (let* ((vns (normalize-set v '() s))
-                 (x (set-tail vns)))
-            (cond
-              ((and (var? u) (eq? x u))
-               ((fresh (n)
-                  (== u (with-set-tail n vns))
-                  (setc n))
-                 s))
-              ((non-empty-set? u)
-               (let ((uns (normalize-set u '() s)))
-                 (if (not (eq? (set-tail uns) (set-tail vns)))
-                   (let ((tu (non-empty-set-first uns))
-                         (ru (non-empty-set-rest uns))
-                         (tv (non-empty-set-first vns))
-                         (rv (non-empty-set-rest vns)))
-                     ((conde
-                        ((== tu tv) (== ru rv))
-                        ((== tu tv) (== uns rv))
-                        ((== tu tv) (== ru vns))
-                        ((fresh (n)
-                           (== ru `#(,n ,tv))
-                           (== rv `#(,n ,tu))
-                           (setc n))))
-                       s))
-                   ((let ((t0 (non-empty-set-first uns))
-                          (ru (non-empty-set-rest uns))
-                          (maxj (non-empty-set-size vns)))
-                      (let loopj ((j 0))
-                        (if (< j maxj)
-                          (let ((tj (non-empty-set-at j vns))
-                                (rj (non-empty-set-except-at j vns)))
-                            (conde
-                              ((== t0 tj) (== ru rj))
-                              ((== t0 tj) (== uns rj))
-                              ((== t0 tj) (== ru vns))
-                              ((fresh (n)
-                                 (== x `#(,n ,t0))
-                                 (== (with-set-tail n ru) (with-set-tail n vns))
-                                 (setc n)))
-                              ((loopj (+ j 1)))))
-                          fail))) s))))
-              (else (fail s)))))
-        ((and (pair? u) (pair? v))
-         (let ((s (unify
-                    (car u) (car v) s)))
-           (and s (unify
-                    (cdr u) (cdr v) s))))
-        ((equal? u v) s)
-        (else #f)))))
 
 (define ext-s-check
   (lambda (x v s)
@@ -269,11 +210,6 @@
          (cons (car a)
            (take (and n (- n 1)) f)))))))
 
-(define ==
-  (lambda (u v)
-    (lambdag@ (s)
-      (unify u v s))))
-
 (define-syntax fresh
   (syntax-rules ()
     ((_ (x ...) g0 g ...)
@@ -362,6 +298,71 @@
      (lambdag@ (s)
        (let ((x (walk* x s)) ...)
          ((fresh () g g* ...) s))))))
+
+
+(define unify
+  (lambda (ou ov s)
+    (let ((u (walk ou s))
+          (v (walk ov s)))
+      (cond
+        ((and (var? v) (not (var? u))) (unify ov ou s))
+        ((eq? u v) s)
+        ((and (var? u) (not (occurs-check u v s))) (ext-s u v s))
+        ((non-empty-set? v)
+          (let* ((vns (normalize-set v '() s))
+                 (x (set-tail vns)))
+            (cond
+              ((and (var? u) (eq? x u))
+               ((fresh (n)
+                  (== u (with-set-tail n vns))
+                  (setc n))
+                 s))
+              ((non-empty-set? u)
+               (let ((uns (normalize-set u '() s)))
+                 (if (not (eq? (set-tail uns) (set-tail vns)))
+                   (let ((tu (non-empty-set-first uns))
+                         (ru (non-empty-set-rest uns))
+                         (tv (non-empty-set-first vns))
+                         (rv (non-empty-set-rest vns)))
+                     ((conde
+                        ((== tu tv) (== ru rv))
+                        ((== tu tv) (== uns rv))
+                        ((== tu tv) (== ru vns))
+                        ((fresh (n)
+                           (== ru `#(,n ,tv))
+                           (== rv `#(,n ,tu))
+                           (setc n))))
+                       s))
+                   ((let ((t0 (non-empty-set-first uns))
+                          (ru (non-empty-set-rest uns))
+                          (maxj (non-empty-set-size vns)))
+                      (let loopj ((j 0))
+                        (if (< j maxj)
+                          (let ((tj (non-empty-set-at j vns))
+                                (rj (non-empty-set-except-at j vns)))
+                            (conde
+                              ((== t0 tj) (== ru rj))
+                              ((== t0 tj) (== uns rj))
+                              ((== t0 tj) (== ru vns))
+                              ((fresh (n)
+                                 (== x `#(,n ,t0))
+                                 (== (with-set-tail n ru) (with-set-tail n vns))
+                                 (setc n)))
+                              ((loopj (+ j 1)))))
+                          fail))) s))))
+              (else (fail s)))))
+        ((and (pair? u) (pair? v))
+         (let ((s (unify
+                    (car u) (car v) s)))
+           (and s (unify
+                    (cdr u) (cdr v) s))))
+        ((equal? u v) s)
+        (else #f)))))
+
+(define ==
+  (lambda (u v)
+    (lambdag@ (s)
+      (unify u v s))))
 
 (define succeed (== #f #f))
 
