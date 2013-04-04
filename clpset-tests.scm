@@ -104,3 +104,11 @@
       (set _.2)
       (=/= (_.1 _.0))
       (!in (_.0 _.2)))))
+
+(test-check "set-run-union-cats-and-dogs-1"
+  (length
+    (run* (q)
+      (fresh (x y z v)
+        (== q `(,x ,y ,z ,v))
+        (uniono `#(,empty-set cat ,x ,y) `#(,empty-set dog bird ,z) v))))
+  57)
