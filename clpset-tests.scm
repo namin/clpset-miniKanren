@@ -83,8 +83,8 @@
 
 (test-check "set-run-neq-2"
   (run* (q) (=/= `#(,q c) `#(,empty-set b c)))
-  '((#(_.0 _.1) : (set _.0) (=/= (_.1 b) (_.1 c)))
-    (_.0 : (set _.0) (!in (b _.0)))))
+  '((_.0 : (set _.0) (!in (b _.0)))
+    (#(_.0 _.1) : (set _.0) (=/= (_.1 b) (_.1 c)))))
 
 (test-check "set-run-union-1"
   (run* (q) (fresh (x y z v)

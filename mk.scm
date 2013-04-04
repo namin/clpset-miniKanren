@@ -111,20 +111,17 @@
         (cond
           ((var? x) (with-C s (with-C-set (s->C s) (join `(,x) (C->set (s->C s))))))
           ((empty-set? x) s)
-          ((non-empty-set? x) ((seto (vector-ref x 0)) s))
+          ((non-empty-set? x) (bind s (seto (vector-ref x 0))))
           (else #f))))))
-(define tagged-list?
-  (lambda (tag lst)
-    (and (list? lst) (not (null? lst)) (eq? tag (car lst)))))
 
 (define check-constraints
-  (lambda (k C->c with-C-c apply-c)
+  (lambda (C->c with-C-c apply-c)
     (lambda (s)
       (let loop ((cs (C->c (s->C s))) (s (with-C s (with-C-c (s->C s) '()))))
         (cond
-          ((not s) (k #f))
+          ((not s) #f)
           ((null? cs) s)
-          (else (loop (cdr cs) ((apply-c (car cs)) s))))))))
+          (else (loop (cdr cs) (bind s (apply-c (car cs))))))))))
 (define tree-collect
   (lambda (predicate tree acc)
     (let ((acc (if (predicate tree)
@@ -138,23 +135,21 @@
          (tree-collect predicate (vector->list tree) acc))
         (else acc)))))
 (define infer-sets
-  (lambda (k vs)
+  (lambda (vs)
     (lambda (s)
       (let loop ((vs (tree-collect non-empty-set? vs '())) (s s))
         (cond
-          ((not s) (k #f))
+          ((not s) #f)
           ((null? vs) s)
-          (else (loop (cdr vs) ((seto (car vs)) s))))))))
+          (else (loop (cdr vs) (bind s (seto (car vs))))))))))
 (define run-constraints
   (lambda (s . vs)
-    (call/cc
-      (lambda (k)
-        (let* ((s (with-C s (walk* (s->C s) s)))
-               (s ((infer-sets k vs) s))
-               (s ((check-constraints k C->set with-C-set seto) s))
-               (s ((check-constraints k C->!in with-C-!in (lambda (args) (apply !ino args))) s))
-               (s ((check-constraints k C->=/= with-C-=/= (lambda (args) (apply =/= args))) s)))
-          s)))))
+    (let* ((s (with-C s (walk* (s->C s) s)))
+           (s (bind s (infer-sets vs)))
+           (s (bind s (check-constraints C->set with-C-set seto)))
+           (s (bind s (check-constraints C->!in with-C-!in (lambda (args) (apply !ino args)))))
+           (s (bind s (check-constraints C->=/= with-C-=/= (lambda (args) (apply =/= args))))))
+      s)))
 
 (define walk
   (lambda (u s)
@@ -397,10 +392,10 @@
                  (x (set-tail vns)))
             (cond
               ((and (var? u) (eq? x u))
-               (((fresh (n)
-                   (== u (with-set-tail n vns))
-                   (seto n))
-                  s)))
+                (bind s
+                  (fresh (n)
+                    (== u (with-set-tail n vns))
+                    (seto n))))
               ((non-empty-set? u)
                (let ((uns (normalize-set u '() s)))
                  (if (not (eq? (set-tail uns) (set-tail vns)))
@@ -408,32 +403,33 @@
                          (ru (non-empty-set-rest uns))
                          (tv (non-empty-set-first vns))
                          (rv (non-empty-set-rest vns)))
-                     ((conde
-                        ((== tu tv) (== ru rv) (seto ru))
-                        ((== tu tv) (== uns rv))
-                        ((== tu tv) (== ru vns))
-                        ((fresh (n)
-                           (== ru `#(,n ,tv))
-                           (== rv `#(,n ,tu))
-                           (seto n))))
-                       s))
+                     (bind s
+                       (conde
+                         ((== tu tv) (== ru rv) (seto ru))
+                         ((== tu tv) (== uns rv))
+                         ((== tu tv) (== ru vns))
+                         ((fresh (n)
+                            (== ru `#(,n ,tv))
+                            (== rv `#(,n ,tu))
+                            (seto n))))))
                    ((let ((t0 (non-empty-set-first uns))
                           (ru (non-empty-set-rest uns))
                           (maxj (non-empty-set-size vns)))
-                      (let loopj ((j 0))
-                        (if (< j maxj)
-                          (let ((tj (non-empty-set-at j vns))
-                                (rj (non-empty-set-except-at j vns)))
-                            (conde
-                              ((== t0 tj) (== ru rj) (seto ru))
-                              ((== t0 tj) (== uns rj))
-                              ((== t0 tj) (== ru vns))
-                              ((fresh (n)
-                                 (== x `#(,n ,t0))
-                                 (== (with-set-tail n ru) (with-set-tail n vns))
-                                 (seto n)))
-                              ((loopj (+ j 1)))))
-                          fail))) s))))
+                      (bind s
+                        (let loopj ((j 0))
+                          (if (< j maxj)
+                            (let ((tj (non-empty-set-at j vns))
+                                   (rj (non-empty-set-except-at j vns)))
+                              (conde
+                                ((== t0 tj) (== ru rj) (seto ru))
+                                ((== t0 tj) (== uns rj))
+                                ((== t0 tj) (== ru vns))
+                                ((fresh (n)
+                                   (== x `#(,n ,t0))
+                                   (== (with-set-tail n ru) (with-set-tail n vns))
+                                   (seto n)))
+                                ((loopj (+ j 1)))))
+                            fail))))))))
               (else #f))))
         ((and (pair? u) (pair? v))
          (let ((s (unify
@@ -451,7 +447,7 @@
 (define ino
   (lambda (t x)
     (lambda (s)
-      (let ((s ((seto x) s)))
+      (let ((s (bind s (seto x))))
         (if (not s)
           #f
           (let ((x (walk x s)))
@@ -460,13 +456,15 @@
               ((non-empty-set? x)
                 (let ((tx (non-empty-set-first x))
                       (rx (non-empty-set-rest x)))
-                  ((conde
-                     ((== tx t))
-                     ((ino t rx))) s)))
+                  (bind s
+                    (conde
+                      ((== tx t))
+                      ((ino t rx))))))
               ((var? x)
-                (((fresh (n)
+                (bind s
+                  (fresh (n)
                     (== x `#(,n ,t))
-                    (seto n)) s)))
+                    (seto n))))
               (else #f))))))))
 
 (define atom?
@@ -480,15 +478,16 @@
             (v (walk ov s)))
         (cond
           ((and (var? v) (not (var? u)))
-           ((=/= ov ou) s))
+           (bind s (=/= ov ou)))
           ((and (pair? u) (pair? v))
-           ((conde
-              ((=/= (car u) (car v)))
-              ((=/= (cdr u) (cdr v)))) s))
+            (bind s
+              (conde
+                ((=/= (car u) (car v)))
+                ((=/= (cdr u) (cdr v))))))
           ((equal? u v)
            #f)
           ((and (atom? u) (atom? v))
-            s)
+           s)
           ((and (var? u) (occurs-check u v s))
            (if (non-empty-set? v)
              (let* ((vns (normalize-set v '() s))
@@ -498,24 +497,26 @@
                  (begin
                    (assert (eq? u (vector-ref vns 0)))
                    (let loop ((vts vts))
-                     ((if (null? vts)
-                        fail
-                        (conde
-                          ((!ino (car vts) u))
-                          ((loop (cdr vts))))) s)))))
+                     (bind s
+                       (if (null? vts)
+                         fail
+                         (conde
+                           ((!ino (car vts) u))
+                           ((loop (cdr vts))))))))))
              s))
           ((and (non-empty-set? u) (non-empty-set? v))
-           (((fresh (n)
+           (bind s
+             (fresh (n)
                (conde
                  ((ino n u) (!ino n v))
-                 ((ino n v) (!ino n u)))) s)))
+                 ((ino n v) (!ino n u))))))
           (else
             (with-C s (with-C-=/= (s->C s) (join `((,u ,v)) (C->=/= (s->C s)))))))))))
 
 (define !ino
   (lambda (t x)
     (lambda (s)
-      (let ((s ((seto x) s)))
+      (let ((s (bind s (seto x))))
         (if (not s)
           #f
           (let ((x (walk x s)))
@@ -524,9 +525,10 @@
               ((non-empty-set? x)
                 (let ((tx (non-empty-set-first x))
                       (rx (non-empty-set-rest x)))
-                  (((fresh ()
+                  (bind s
+                    (fresh ()
                       (=/= tx t)
-                      (!ino t rx)) s))))
+                      (!ino t rx)))))
               ((and (var? x) (occurs-check x t s))
                 s)
               (else
@@ -542,34 +544,36 @@
                 (y (walk y s))
                 (z (walk z s)))
             (cond
-              ((equal? x y) ((== x z) s))
-              ((empty-set? z) (((fresh () (== x z) (== y z)) s)))
-              ((empty-set? x) ((== y z) s))
-              ((empty-set? y) ((== x z) s))
+              ((equal? x y) (bind s (== x z)))
+              ((empty-set? z) (bind s (fresh () (== x z) (== y z))))
+              ((empty-set? x) (bind s (== y z)))
+              ((empty-set? y) (bind s (== x z)))
               ((non-empty-set? z)
                (let ((tz (non-empty-set-first z)))
-                 (((fresh (n)
-                      (== z `#(,n ,tz))
-                      (!ino tz n)
-                      (conde
-                        ((fresh (n1)
-                           (== x `#(,n1 ,tz))
-                           (!ino tz n1)
-                           (uniono n1 y n)))
-                        ((fresh (n1)
-                           (== y `#(,n1 ,tz))
-                           (!ino tz n1)
-                           (uniono x n1 n)))
-                        ((fresh (n1 n2)
-                           (== x `#(,n1 ,tz))
-                           (!ino tz n1)
-                           (== y `#(,n2 ,tz))
-                           (!ino tz n2)
-                           (uniono n1 n2 n))))) s))))
+                 (bind s
+                   (fresh (n)
+                    (== z `#(,n ,tz))
+                    (!ino tz n)
+                    (conde
+                      ((fresh (n1)
+                         (== x `#(,n1 ,tz))
+                         (!ino tz n1)
+                         (uniono n1 y n)))
+                      ((fresh (n1)
+                         (== y `#(,n1 ,tz))
+                         (!ino tz n1)
+                         (uniono x n1 n)))
+                      ((fresh (n1 n2)
+                         (== x `#(,n1 ,tz))
+                         (!ino tz n1)
+                         (== y `#(,n2 ,tz))
+                         (!ino tz n2)
+                         (uniono n1 n2 n))))))))
               ((or (non-empty-set? x) (non-empty-set? y))
                (let-values (((x y) (if (non-empty-set? x) (values x y) (values y x))))
                  (let ((tx (non-empty-set-first x)))
-                   (((fresh (n n1)
+                   (bind s
+                     (fresh (n n1)
                        (== x `#(,n1 ,tx))
                        (!ino tx n1)
                        (== z `#(,n ,tx))
@@ -579,7 +583,7 @@
                          ((fresh (n2)
                             (== y `#(,n2 ,tx))
                             (!ino tx n2)
-                            (uniono n1 n2 n))))) s)))))
+                            (uniono n1 n2 n)))))))))
               ;; skipping cases (6) and (7) in Fig. 7
               (else (with-C s (with-C-union (s->C s) (join `((,x ,y ,z)) (C->union (s->C s)))))))))))))
 
