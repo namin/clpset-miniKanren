@@ -33,11 +33,15 @@
 (define s->S (lambda (s) (car s)))
 (define s->C (lambda (s) (cadr s)))
 (define C->set (lambda (C) (car C)))
+(define C->=/= (lambda (C) (cadr C)))
+(define C->!in (lambda (C) (caddr C)))
 (define S->s (lambda (S) (with-S empty-s S)))
 (define with-S (lambda (s S) (list S (s->C s))))
 (define with-C (lambda (s C) (list (s->S s) C)))
-(define with-C-set (lambda (C cs) (list cs)))
-(define empty-s '(() (())))
+(define with-C-set (lambda (C cs) (list cs (C->=/= C) (C->!in C))))
+(define with-C-=/= (lambda (C cs) (list (C->set C) cs (C->!in C))))
+(define with-C-!in (lambda (C cs) (list (C->set C) (C->=/= C) cs)))
+(define empty-s '(() (() () ())))
 
 (define empty-set '#())
 (define empty-set? (lambda (x) (and (vector? x) (= (vector-length x) 0))))
@@ -111,14 +115,14 @@
   (lambda (tag lst)
     (and (list? lst) (not (null? lst)) (eq? tag (car lst)))))
 
-(define constraints-set-check
-  (lambda (k)
+(define check-constraints
+  (lambda (k C->c with-C-c apply-c)
     (lambda (s)
-      (let loop ((Cset (C->set (s->C s))) (s (with-C s (with-C-set (s->C s) '()))))
+      (let loop ((cs (C->c (s->C s))) (s (with-C s (with-C-c (s->C s) '()))))
         (cond
           ((not s) (k #f))
-          ((null? Cset) s)
-          (else (loop (cdr Cset) ((seto (car Cset)) s))))))))
+          ((null? cs) s)
+          (else (loop (cdr cs) ((apply-c (car cs)) s))))))))
 (define tree-collect
   (lambda (predicate tree acc)
     (let ((acc (if (predicate tree)
@@ -145,7 +149,9 @@
       (lambda (k)
         (let* ((s (with-C s (walk* (s->C s) s)))
                (s ((infer-sets k vs) s))
-               (s ((constraints-set-check k) s)))
+               (s ((check-constraints k C->set with-C-set seto) s))
+               (s ((check-constraints k C->!in with-C-!in (lambda (args) (apply !ino args))) s))
+               (s ((check-constraints k C->=/= with-C-=/= (lambda (args) (apply =/= args))) s)))
           s)))))
 
 (define walk
@@ -209,13 +215,30 @@
     (string->symbol
       (string-append "_" "." (number->string n)))))
 
+(define reify-set-constraints
+  (lambda (s r others)
+    (let ((cs (filter (lambda (x) (not (var? x))) (map (lambda (x) (walk x r)) (C->set (s->C s))))))
+      (if (null? cs)
+        others
+        (cons (cons 'set (sort (lambda (s1 s2) (string<? (symbol->string s1) (symbol->string s2))) (join cs '())))
+          others)))))
+(define reify-binary-constraints
+  (lambda (tag C->c)
+    (lambda (s r others)
+      (let ((cs (filter (lambda (x) (null? (tree-collect (lambda (v) (var? v)) x '()))) (map (lambda (x) (walk* x r)) (C->c (s->C s))))))
+        (if (null? cs)
+          others
+          (cons (cons tag (sort (lambda (s1 s2) (string<? (format "~a" s1) (format "~a" s2))) (join cs '())))
+            others))))))
+(define reify-neq-constraints
+  (reify-binary-constraints '=/= C->=/=))
+(define reify-!in-constraints
+  (reify-binary-constraints '!in C->!in))
 (define reify-constraints
   (lambda (s r)
-    (let* ((C (s->C s))
-           (Cset (filter (lambda (x) (not (var? x))) (map (lambda (x) (walk x r)) (C->set C)))))
-      (if (null? Cset)
-        '()
-        (list (cons 'set (sort (lambda (s1 s2) (string<? (symbol->string s1) (symbol->string s2))) (join Cset '()))))))))
+    (reify-set-constraints s r
+      (reify-neq-constraints s r
+        (reify-!in-constraints s r '())))))
 (define reify
   (lambda (v s)
     (let* ((v (walk* v s))
@@ -448,6 +471,63 @@
                    (== x `#(,n ,t))
                    (seto n)) s))
               (else #f))))))))
+
+(define =/=
+  (lambda (ou ov)
+    (lambda (s)
+      (let ((u (walk ou s))
+            (v (walk ov s)))
+        (cond
+          ((and (var? v) (not (var? u)))
+           ((=/= ov ou) s))
+          ((and (pair? u) (pair? v))
+           ((conde
+              ((=/= (car u) (car v)))
+              ((=/= (cdr u) (cdr v)))) s))
+          ((equal? u v)
+           #f)
+          ((and (var? u) (occurs-check u v s))
+           (if (non-empty-set? v)
+             (let* ((vns (normalize-set v '() s))
+                    (vts (cdr (vector->list vns))))
+               (if (occurs-check u vts s)
+                 s
+                 (begin
+                   (assert (eq? u (vector-ref vns 0)))
+                   (let loop ((vts vts))
+                     ((if (null? vts)
+                        fail
+                        (conde
+                          ((!ino (car vts) u))
+                          ((loop (cdr vts))))) s)))))
+             s))
+          ((and (non-empty-set? u) (non-empty-set? v))
+           ((fresh (n)
+              (conde
+                ((ino n u) (!ino n v))
+                ((ino n v) (!ino n u)))) s))
+          (else
+            (with-C s (with-C-=/= (s->C s) (join `((,u ,v)) (C->=/= (s->C s)))))))))))
+
+(define !ino
+  (lambda (t x)
+    (lambda (s)
+      (let ((s ((seto x) s)))
+        (if (not s)
+          #f
+          (let ((x (walk x s)))
+            (cond
+              ((empty-set? x) s)
+              ((non-empty-set? x)
+                (let ((tx (non-empty-set-first x))
+                      (rx (non-empty-set-rest x)))
+                  ((fresh ()
+                     (=/= tx t)
+                     (!ino t rx)) s)))
+              ((and (var? x) (occurs-check x t s))
+                s)
+              (else
+                (with-C s (with-C-!in (s->C s) (join `((,t ,x)) (C->!in (s->C s)))))))))))))
 
 (define succeed (== #f #f))
 

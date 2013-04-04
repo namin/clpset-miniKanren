@@ -38,3 +38,20 @@ a in {X,b,Y\Z}.
 %
 % Z = {a\_1}
 % Constraint: set(_1)
+
+f(a, {b,c}) neq f(X, {X,Y}).
+
+% true
+% Constraint: X neq a
+%
+% true
+% Constraint: X neq b, Y neq b
+%
+% true
+% Constraint: X neq c, Y neq c
+%
+% true
+% Constraint: X neq b, X neq c
+%
+% true
+% Constraint: Y neq b, Y neq c
