@@ -472,6 +472,10 @@
                    (seto n)) s))
               (else #f))))))))
 
+(define atom?
+  (lambda (x)
+    (and (not (pair? x)) (not (vector? x)))))
+
 (define =/=
   (lambda (ou ov)
     (lambda (s)
@@ -486,6 +490,8 @@
               ((=/= (cdr u) (cdr v)))) s))
           ((equal? u v)
            #f)
+          ((and (atom? u) (atom? v))
+            s)
           ((and (var? u) (occurs-check u v s))
            (if (non-empty-set? v)
              (let* ((vns (normalize-set v '() s))

@@ -29,7 +29,6 @@ X={{x\Z}\X}.
 %Constraint: set(_1), set(Z)
 
 a in {X,b,Y\Z}.
-
 % X = a
 % Constraint: set(Z)
 %
@@ -40,7 +39,6 @@ a in {X,b,Y\Z}.
 % Constraint: set(_1)
 
 f(a, {b,c}) neq f(X, {X,Y}).
-
 % true
 % Constraint: X neq a
 %
@@ -55,3 +53,10 @@ f(a, {b,c}) neq f(X, {X,Y}).
 %
 % true
 % Constraint: Y neq b, Y neq c
+
+{c\X} neq {b,c}.
+% X = {_1\_2}
+% Constraint: set(_2), _1 neq b, _1 neq c
+%
+% true
+% Constraint: b nin X, set(X)
