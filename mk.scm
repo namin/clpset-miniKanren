@@ -496,8 +496,8 @@
                  s
                  (begin
                    (assert (eq? u (vector-ref vns 0)))
-                   (let loop ((vts vts))
-                     (bind s
+                   (bind s
+                     (let loop ((vts vts))
                        (if (null? vts)
                          fail
                          (conde
