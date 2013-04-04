@@ -80,3 +80,7 @@ un({X},{Y\Z},V).
 % Z = {X\_G54},
 % V = {X,Y\_G54}
 % Constraint:[X neq Y,X nin _G54,set(_G54)]
+
+disj({X,Y},{a\Z}).
+% true
+% Constraint:[X neq a,X nin Z,Y neq a,Y nin Z,set(Z)]

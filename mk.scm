@@ -36,14 +36,16 @@
 (define C->=/= (lambda (C) (cadr C)))
 (define C->!in (lambda (C) (caddr C)))
 (define C->union (lambda (C) (cadddr C)))
+(define C->disj (lambda (C) (cadddr (cdr C))))
 (define S->s (lambda (S) (with-S empty-s S)))
 (define with-S (lambda (s S) (list S (s->C s))))
 (define with-C (lambda (s C) (list (s->S s) C)))
-(define with-C-set (lambda (C cs) (list cs (C->=/= C) (C->!in C) (C->union C))))
-(define with-C-=/= (lambda (C cs) (list (C->set C) cs (C->!in C) (C->union C))))
-(define with-C-!in (lambda (C cs) (list (C->set C) (C->=/= C) cs (C->union C))))
-(define with-C-union (lambda (C cs) (list (C->set C) (C->=/= C) (C->!in C) cs)))
-(define empty-s '(() (() () () ())))
+(define with-C-set (lambda (C cs) (list cs (C->=/= C) (C->!in C) (C->union C) (C->disj C))))
+(define with-C-=/= (lambda (C cs) (list (C->set C) cs (C->!in C) (C->union C) (C->disj C))))
+(define with-C-!in (lambda (C cs) (list (C->set C) (C->=/= C) cs (C->union C) (C->disj C))))
+(define with-C-union (lambda (C cs) (list (C->set C) (C->=/= C) (C->!in C) cs (C->disj C))))
+(define with-C-disj (lambda (C cs) (list (C->set C) (C->=/= C) (C->!in C) (C->union C) cs)))
+(define empty-s '(() (() () () () ())))
 
 (define empty-set '#())
 (define empty-set? (lambda (x) (and (vector? x) (= (vector-length x) 0))))
@@ -148,6 +150,7 @@
            (s (bind s (infer-sets vs)))
            (s (bind s (check-constraints C->set with-C-set seto)))
            (s (bind s (check-constraints C->union with-C-union (lambda (args) (apply uniono args)))))
+           (s (bind s (check-constraints C->disj with-C-disj (lambda (args) (apply disjo args)))))
            (s (bind s (check-constraints C->!in with-C-!in (lambda (args) (apply !ino args)))))
            (s (bind s (check-constraints C->=/= with-C-=/= (lambda (args) (apply =/= args))))))
       s)))
@@ -229,12 +232,15 @@
   (reify-some-constraints '!in C->!in))
 (define reify-union-constraints
   (reify-some-constraints 'union C->union))
+(define reify-disj-constraints
+  (reify-some-constraints 'disj C->disj))
 (define reify-constraints
   (lambda (s r)
     (reify-set-constraints s r
       (reify-neq-constraints s r
         (reify-!in-constraints s r
-          (reify-union-constraints s r '()))))))
+          (reify-union-constraints s r
+            (reify-disj-constraints s r '())))))))
 (define reify
   (lambda (v s)
     (let* ((v (walk* v s))
@@ -590,6 +596,42 @@
                             (uniono n1 n2 n)))))))))
               ;; skipping cases (6) and (7) in Fig. 7
               (else (with-C s (with-C-union (s->C s) (join `((,x ,y ,z)) (C->union (s->C s)))))))))))))
+
+(define disjo
+  (lambda (x y)
+    (lambda (s)
+      (let ((s (((fresh () (seto x) (seto y)) s))))
+        (if (not s)
+          #f
+          (let ((x (walk x s))
+                (y (walk y s)))
+            (cond
+              ((empty-set? x) s)
+              ((empty-set? y) s)
+              ((and (var? x) (eq? x y)) (bind s (== x empty-set)))
+              ((or (and (non-empty-set? x) (var? y))
+                   (and (non-empty-set? y) (var? x)))
+               (let-values (((x y) (if (non-empty-set? x) (values x y) (values y x))))
+                 (let ((tx (non-empty-set-first x))
+                       (rx (non-empty-set-rest x)))
+                   (bind s
+                     (fresh ()
+                       (!ino tx y)
+                       (disjo y rx))))))
+              ((and (non-empty-set? x) (non-empty-set? y))
+               (let ((tx (non-empty-set-first x))
+                     (rx (non-empty-set-rest x))
+                     (ty (non-empty-set-first y))
+                     (ry (non-empty-set-rest y)))
+                 (bind s
+                   (fresh ()
+                     (=/= tx ty)
+                     (!ino tx ry)
+                     (!ino ty rx)
+                     (disjo rx ry)))))
+              (else
+                (assert (and (var? x) (var? y)))
+                (with-C s (with-C-disj (s->C s) (join `((,x ,y)) (C->disj (s->C s)))))))))))))
 
 (define succeed (== #f #f))
 

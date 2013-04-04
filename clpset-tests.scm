@@ -112,3 +112,13 @@
         (== q `(,x ,y ,z ,v))
         (uniono `#(,empty-set cat ,x ,y) `#(,empty-set dog bird ,z) v))))
   57)
+
+(test-check "set-run-disj-1"
+  (run* (q)
+    (fresh (x y z)
+      (== q `(,x ,y ,z))
+      (disjo `#(,empty-set ,x ,y) `#(,z a))))
+  '(((_.0 _.1 _.2) :
+      (set _.2)
+      (=/= (_.0 a) (_.1 a))
+      (!in (_.0 _.2) (_.1 _.2)))))
