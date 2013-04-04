@@ -147,6 +147,7 @@
     (let* ((s (with-C s (walk* (s->C s) s)))
            (s (bind s (infer-sets vs)))
            (s (bind s (check-constraints C->set with-C-set seto)))
+           (s (bind s (check-constraints C->union with-C-union (lambda (args) (apply uniono args)))))
            (s (bind s (check-constraints C->!in with-C-!in (lambda (args) (apply !ino args)))))
            (s (bind s (check-constraints C->=/= with-C-=/= (lambda (args) (apply =/= args))))))
       s)))
@@ -226,11 +227,14 @@
   (reify-some-constraints '=/= C->=/=))
 (define reify-!in-constraints
   (reify-some-constraints '!in C->!in))
+(define reify-union-constraints
+  (reify-some-constraints 'union C->union))
 (define reify-constraints
   (lambda (s r)
     (reify-set-constraints s r
       (reify-neq-constraints s r
-        (reify-!in-constraints s r '())))))
+        (reify-!in-constraints s r
+          (reify-union-constraints s r '()))))))
 (define reify
   (lambda (v s)
     (let* ((v (walk* v s))
