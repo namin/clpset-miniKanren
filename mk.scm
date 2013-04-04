@@ -649,6 +649,19 @@
                   ((ino n x) (!ino n z))
                   ((ino n y) (!ino n z)))))))))))
 
+(define !disjo
+  (lambda (x y)
+    (lambda (s)
+      (let ((s (((fresh () (seto x) (seto y)) s))))
+        (if (not s)
+          #f
+          (let ((x (walk x s))
+                (y (walk y s)))
+            (bind s
+              (fresh (n)
+                (ino n x)
+                (ino n y)))))))))
+
 (define succeed (== #f #f))
 
 (define fail (== #f #t))

@@ -98,3 +98,6 @@ nun(X,Y,{a,b}).
 %
 % Y = {_1\_2}
 % Constraint:[set(_2),_1 neq a,_1 neq b,set(X)]
+
+ndisj({a},{X,b}).
+% X = a
