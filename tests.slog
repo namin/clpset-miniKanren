@@ -60,3 +60,23 @@ f(a, {b,c}) neq f(X, {X,Y}).
 %
 % true
 % Constraint: b nin X, set(X)
+
+%% NOTE: switching to older release of {log},
+%%       closer to paper description
+%% http://www.math.unipr.it/~gianfr/SETLOG/setlog_4_3.pl
+un({X},{Y\Z},V).
+% V = {X,Y\Z}
+% Constraint:[X neq Y,X nin Z,set(Z)]
+%
+% Y = X,
+% V = {X\Z}
+% Constraint:[X nin Z,set(Z)]
+%
+% Y = X,
+% Z = {X\_G54},
+% V = {X\_G54}
+% Constraint:[X nin _G54]
+%
+% Z = {X\_G54},
+% V = {X,Y\_G54}
+% Constraint:[X neq Y,X nin _G54,set(_G54)]
