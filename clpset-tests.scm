@@ -64,3 +64,9 @@
 (test-check "set-run-eq-4"
   (run* (q) (fresh (z) (== q `#(,q #(,z 1)))))
   '((#(_.0 #(_.1 1)) : (set  _.0 _.1))))
+
+(test-check "set-run-ino-1"
+  (run* (q) (fresh (x y z) (== q `(,x ,y ,z)) (ino 'a `#(,z ,x b ,y))))
+  '(((a _.0 _.1) : (set _.1))
+    ((_.0 a _.1) : (set _.1))
+    ((_.0 _.1 #(_.2 a)) : (set _.2))))

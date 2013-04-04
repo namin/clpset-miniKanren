@@ -101,11 +101,12 @@
 (define seto
   (lambda (x)
     (lambda (s)
-      (cond
-        ((var? x) (with-C s (with-C-set (s->C s) (join `(,x) (C->set (s->C s))))))
-        ((empty-set? x) s)
-        ((non-empty-set? x) ((seto (vector-ref x 0)) s))
-        (else #f)))))
+      (let ((x (walk x s)))
+        (cond
+          ((var? x) (with-C s (with-C-set (s->C s) (join `(,x) (C->set (s->C s))))))
+          ((empty-set? x) s)
+          ((non-empty-set? x) ((seto (vector-ref x 0)) s))
+          (else #f))))))
 (define tagged-list?
   (lambda (tag lst)
     (and (list? lst) (not (null? lst)) (eq? tag (car lst)))))
@@ -426,6 +427,27 @@
   (lambda (u v)
     (lambdag@ (s)
       (unify u v s))))
+
+(define ino
+  (lambda (t x)
+    (lambda (s)
+      (let ((s ((seto x) s)))
+        (if (not s)
+          #f
+          (let ((x (walk x s)))
+            (cond
+              ((empty-set? x) #f)
+              ((non-empty-set? x)
+                (let ((tx (non-empty-set-first x))
+                       (rx (non-empty-set-rest x)))
+                  ((conde
+                     ((== tx t))
+                     ((ino t rx))) s)))
+              ((var? x)
+                ((fresh (n)
+                   (== x `#(,n ,t))
+                   (seto n)) s))
+              (else #f))))))))
 
 (define succeed (== #f #f))
 

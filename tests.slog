@@ -27,3 +27,14 @@ X={x\X} & X={y\X}.
 X={{x\Z}\X}.
 %X = {{x\Z}\_1}
 %Constraint: set(_1), set(Z)
+
+a in {X,b,Y\Z}.
+
+% X = a
+% Constraint: set(Z)
+%
+% Y = a
+% Constraint: set(Z)
+%
+% Z = {a\_1}
+% Constraint: set(_1)
