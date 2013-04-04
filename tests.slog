@@ -20,6 +20,10 @@ X={x\X} & X={y\X}.
 % S = {X\R}
 % Constraint: set(R)
 %
-% R = {Y\_G682},  
-% S = {X\_G682}
-% Constraint: set(_G682)
+% R = {Y\_1},
+% S = {X\_1}
+% Constraint: set(_1)
+
+X={{x\Z}\X}.
+%X = {{x\Z}\_1}
+%Constraint: set(_1), set(Z)

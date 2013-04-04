@@ -118,10 +118,22 @@
           ((not s) (k #f))
           ((null? Cset) s)
           (else (loop (cdr Cset) ((seto (car Cset)) s))))))))
+(define tree-collect
+  (lambda (predicate tree acc)
+    (let ((acc (if (predicate tree)
+                 (cons tree acc)
+                 acc)))
+      (cond
+        ((pair? tree)
+         (tree-collect predicate (cdr tree)
+           (tree-collect predicate (car tree) acc)))
+        ((non-empty-set? tree)
+         (tree-collect predicate (vector->list tree) acc))
+        (else acc)))))
 (define infer-sets
   (lambda (k vs)
     (lambda (s)
-      (let loop ((vs (filter non-empty-set? vs)) (s s))
+      (let loop ((vs (tree-collect non-empty-set? vs '())) (s s))
         (cond
           ((not s) (k #f))
           ((null? vs) s)
@@ -202,7 +214,7 @@
            (Cset (filter (lambda (x) (not (var? x))) (map (lambda (x) (walk x r)) (C->set C)))))
       (if (null? Cset)
         '()
-        (map (lambda (x) (list 'set x)) (join Cset '()))))))
+        (list (cons 'set (sort (lambda (s1 s2) (string<? (symbol->string s1) (symbol->string s2))) (join Cset '()))))))))
 (define reify
   (lambda (v s)
     (let* ((v (walk* v s))
