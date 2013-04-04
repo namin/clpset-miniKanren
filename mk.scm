@@ -217,14 +217,7 @@
     (string->symbol
       (string-append "_" "." (number->string n)))))
 
-(define reify-set-constraints
-  (lambda (s r others)
-    (let ((cs (filter (lambda (x) (not (var? x))) (map (lambda (x) (walk x r)) (C->set (s->C s))))))
-      (if (null? cs)
-        others
-        (cons (cons 'set (sort (lambda (s1 s2) (string<? (symbol->string s1) (symbol->string s2))) (join cs '())))
-          others)))))
-(define reify-binary-constraints
+(define reify-some-constraints
   (lambda (tag C->c)
     (lambda (s r others)
       (let ((cs (filter (lambda (x) (null? (tree-collect (lambda (v) (var? v)) x '()))) (map (lambda (x) (walk* x r)) (C->c (s->C s))))))
@@ -232,10 +225,12 @@
           others
           (cons (cons tag (sort (lambda (s1 s2) (string<? (format "~a" s1) (format "~a" s2))) (join cs '())))
             others))))))
+(define reify-set-constraints
+  (reify-some-constraints 'set C->set))
 (define reify-neq-constraints
-  (reify-binary-constraints '=/= C->=/=))
+  (reify-some-constraints '=/= C->=/=))
 (define reify-!in-constraints
-  (reify-binary-constraints '!in C->!in))
+  (reify-some-constraints '!in C->!in))
 (define reify-constraints
   (lambda (s r)
     (reify-set-constraints s r
