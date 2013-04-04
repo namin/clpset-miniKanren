@@ -633,6 +633,22 @@
                 (assert (and (var? x) (var? y)))
                 (with-C s (with-C-disj (s->C s) (join `((,x ,y)) (C->disj (s->C s)))))))))))))
 
+(define !uniono
+  (lambda (x y z)
+    (lambda (s)
+      (let ((s (((fresh () (seto x) (seto y) (seto z)) s))))
+        (if (not s)
+          #f
+          (let ((x (walk x s))
+                (y (walk y s))
+                (z (walk z s)))
+            (bind s
+              (fresh (n)
+                (conde
+                  ((ino n z) (!ino n x) (!ino n y))
+                  ((ino n x) (!ino n z))
+                  ((ino n y) (!ino n z)))))))))))
+
 (define succeed (== #f #f))
 
 (define fail (== #f #t))
