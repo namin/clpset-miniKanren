@@ -388,7 +388,6 @@
        (let ((x (walk* x s)) ...)
          ((fresh () g g* ...) s))))))
 
-
 (define unify
   (lambda (ou ov s)
     (let ((u (walk ou s))
@@ -397,11 +396,18 @@
         ((and (var? v) (not (var? u))) (unify ov ou s))
         ((eq? u v) s)
         ((and (var? u) (not (occurs-check u v s))) (ext-s u v s))
+        ((and (pair? u) (pair? v))
+         (let ((s (unify
+                    (car u) (car v) s)))
+           (and s (unify
+                    (cdr u) (cdr v) s))))
+        ((equal? u v) s)
         ((non-empty-set? v)
           (let* ((vns (normalize-set v '() s))
                  (x (set-tail vns)))
             (cond
-              ((and (var? u) (eq? x u))
+              ((and (var? u) (eq? x u)
+                 (not (occurs-check u (cdr (vector->list vns)) s)))
                 (bind s
                   (fresh (n)
                     (== u (with-set-tail n vns))
@@ -420,7 +426,7 @@
                          ((== tu tv) (== ru vns))
                          ((fresh (n)
                             (== ru `#(,n ,tv))
-                            (== rv `#(,n ,tu))
+                            (== `#(,n ,tu) rv)
                             (seto n))))))
                    ((let ((t0 (non-empty-set-first uns))
                           (ru (non-empty-set-rest uns))
@@ -429,7 +435,7 @@
                         (let loopj ((j 0))
                           (if (< j maxj)
                             (let ((tj (non-empty-set-at j vns))
-                                   (rj (non-empty-set-except-at j vns)))
+                                  (rj (non-empty-set-except-at j vns)))
                               (conde
                                 ((== t0 tj) (== ru rj) (seto ru))
                                 ((== t0 tj) (== uns rj))
@@ -441,12 +447,6 @@
                                 ((loopj (+ j 1)))))
                             fail))))))))
               (else #f))))
-        ((and (pair? u) (pair? v))
-         (let ((s (unify
-                    (car u) (car v) s)))
-           (and s (unify
-                    (cdr u) (cdr v) s))))
-        ((equal? u v) s)
         (else #f)))))
 
 (define ==
