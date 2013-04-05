@@ -566,7 +566,7 @@
                 (y (walk y s))
                 (z (walk z s)))
             (cond
-              ((equal? x y) (bind s (== x z)))
+              ((eq? x y) (bind s (== x z)))
               ((empty-set? z) (bind s (fresh () (== x z) (== y z))))
               ((empty-set? x) (bind s (== y z)))
               ((empty-set? y) (bind s (== x z)))
