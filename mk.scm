@@ -37,15 +37,17 @@
 (define C->!in (lambda (C) (caddr C)))
 (define C->union (lambda (C) (cadddr C)))
 (define C->disj (lambda (C) (cadddr (cdr C))))
+(define C->symbol (lambda (C) (cadddr (cddr C))))
 (define S->s (lambda (S) (with-S empty-s S)))
 (define with-S (lambda (s S) (list S (s->C s))))
 (define with-C (lambda (s C) (list (s->S s) C)))
-(define with-C-set (lambda (C cs) (list cs (C->=/= C) (C->!in C) (C->union C) (C->disj C))))
-(define with-C-=/= (lambda (C cs) (list (C->set C) cs (C->!in C) (C->union C) (C->disj C))))
-(define with-C-!in (lambda (C cs) (list (C->set C) (C->=/= C) cs (C->union C) (C->disj C))))
-(define with-C-union (lambda (C cs) (list (C->set C) (C->=/= C) (C->!in C) cs (C->disj C))))
-(define with-C-disj (lambda (C cs) (list (C->set C) (C->=/= C) (C->!in C) (C->union C) cs)))
-(define empty-s '(() (() () () () ())))
+(define with-C-set (lambda (C cs) (list cs (C->=/= C) (C->!in C) (C->union C) (C->disj C) (C->symbol C))))
+(define with-C-=/= (lambda (C cs) (list (C->set C) cs (C->!in C) (C->union C) (C->disj C) (C->symbol C))))
+(define with-C-!in (lambda (C cs) (list (C->set C) (C->=/= C) cs (C->union C) (C->disj C) (C->symbol C))))
+(define with-C-union (lambda (C cs) (list (C->set C) (C->=/= C) (C->!in C) cs (C->disj C) (C->symbol C))))
+(define with-C-disj (lambda (C cs) (list (C->set C) (C->=/= C) (C->!in C) (C->union C) cs (C->symbol C))))
+(define with-C-symbol (lambda (C cs) (list (C->set C) (C->=/= C) (C->!in C) (C->union C) (C->disj C) cs)))
+(define empty-s '(() (() () () () () ())))
 
 (define empty-set '#())
 (define empty-set? (lambda (x) (and (vector? x) (= (vector-length x) 0))))
@@ -106,16 +108,6 @@
 (define non-empty-set-size
   (lambda (x)
     (- (vector-length x) 1)))
-(define seto
-  (lambda (x)
-    (lambda (s)
-      (let ((x (walk x s)))
-        (cond
-          ((var? x) (with-C s (with-C-set (s->C s) (join `(,x) (C->set (s->C s))))))
-          ((empty-set? x) s)
-          ((non-empty-set? x) (bind s (seto (vector-ref x 0))))
-          (else #f))))))
-
 (define check-constraints
   (lambda (C->c with-C-c apply-c)
     (lambda (s)
@@ -149,6 +141,7 @@
     (let* ((s (with-C s (walk* (s->C s) s)))
            (s (bind s (infer-sets vs)))
            (s (bind s (check-constraints C->set with-C-set seto)))
+           (s (bind s (check-constraints C->symbol with-C-symbol symbolo)))
            (s (bind s (check-constraints C->union with-C-union (lambda (args) (apply uniono args)))))
            (s (bind s (check-constraints C->disj with-C-disj (lambda (args) (apply disjo args)))))
            (s (bind s (check-constraints C->!in with-C-!in (lambda (args) (apply !ino args)))))
@@ -224,6 +217,8 @@
           others
           (cons (cons tag (sort (lambda (s1 s2) (string<? (format "~a" s1) (format "~a" s2))) (join cs '())))
             others))))))
+(define reify-symbol-constraints
+  (reify-some-constraints 'sym C->symbol))
 (define reify-set-constraints
   (reify-some-constraints 'set C->set))
 (define reify-neq-constraints
@@ -236,11 +231,12 @@
   (reify-some-constraints 'disj C->disj))
 (define reify-constraints
   (lambda (s r)
-    (reify-set-constraints s r
-      (reify-neq-constraints s r
-        (reify-!in-constraints s r
-          (reify-union-constraints s r
-            (reify-disj-constraints s r '())))))))
+    (reify-symbol-constraints s r
+      (reify-set-constraints s r
+        (reify-neq-constraints s r
+          (reify-!in-constraints s r
+            (reify-union-constraints s r
+              (reify-disj-constraints s r '()))))))))
 (define reify
   (lambda (v s)
     (let* ((v (walk* v s))
@@ -675,6 +671,35 @@
               (fresh (n)
                 (ino n x)
                 (ino n y)))))))))
+
+(define seto
+  (lambda (x)
+    (lambda (s)
+      (let ((x (walk x s)))
+        (cond
+          ((var? x)
+            (if (exists
+                  (lambda (y) (eq? x (walk y s)))
+                  (C->symbol (s->C s)))
+              #f
+              (with-C s (with-C-set (s->C s) (join `(,x) (C->set (s->C s)))))))
+          ((empty-set? x) s)
+          ((non-empty-set? x) (bind s (seto (vector-ref x 0))))
+          (else #f))))))
+
+(define symbolo
+  (lambda (x)
+    (lambda (s)
+      (let ((x (walk x s)))
+        (cond
+          ((var? x)
+            (if (exists
+                  (lambda (y) (eq? x (walk y s)))
+                  (C->set (s->C s)))
+              #f
+              (with-C s (with-C-symbol (s->C s) (join `(,x) (C->symbol (s->C s)))))))
+          ((symbol? x) s)
+          (else #f))))))
 
 (define succeed (== #f #f))
 

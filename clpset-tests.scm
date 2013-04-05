@@ -17,6 +17,8 @@
   (normalize-set `#(#(,(var 'x) 1) 2) '() empty-s)
   `#(,(var 'x) 1 2))
 
+;;; feature complete wrt to paper!
+
 (test-check "set-run-eq-1"
   (run* (q) (== q `#(,q 1)))
   '((#(_.0 1) : (set _.0))))
@@ -143,3 +145,35 @@
      (set _.0 _.2 _.3)
      (!in (_.1 _.0) (_.1 _.2) (_.1 _.3))
      (union [_.0 _.2 _.3]))))
+
+;;; useful features beyond the paper
+
+;;; symbolo
+
+(test-check "set-run-symbolo-0"
+  (run* (q) (symbolo q))
+  '((_.0 : (sym _.0))))
+
+(test-check "set-run-symbolo-1"
+  (run* (q)
+    (symbolo q)
+    (== q 'hello))
+  '(hello))
+
+(test-check "set-run-symbolo-2"
+  (run* (q)
+    (symbolo q)
+    (== q empty-set))
+  '())
+
+(test-check "set-run-symbolo-3"
+  (run* (q)
+    (symbolo q)
+    (== q `#(,q x)))
+  '())
+
+(test-check "set-run-symbolo-3"
+  (run* (q)
+    (symbolo q)
+    (seto q))
+  '())
