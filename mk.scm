@@ -53,18 +53,6 @@
 (define empty-set? (lambda (x) (and (vector? x) (= (vector-length x) 0))))
 (define non-empty-set? (lambda (x) (and (vector? x) (> (vector-length x) 1))))
 (define set? (lambda (x) (or (empty-set? x) (non-empty-set? x))))
-(define join
-  (lambda (a b)
-    (cond
-      ((null? a) b)
-      ((member (car a) b) (join (cdr a) b))
-      (else (join (cdr a) (cons (car a) b))))))
-(define joinq
-  (lambda (a b)
-    (cond
-      ((null? a) b)
-      ((memq (car a) b) (join (cdr a) b))
-      (else (join (cdr a) (cons (car a) b))))))
 (define normalize-set
   (lambda (x es s)
     (cond
@@ -72,7 +60,7 @@
       ((non-empty-set? x) (let ((v (vector->list x)))
                             (normalize-set
                               (walk (car v) s)
-                              (joinq (reverse (cdr v)) es)
+                              (append (cdr v) es)
                               s)))
       ((and (var? x) (not (null? es))) `#(,x ,@es))
       ((and (symbol? x) (not (null? es))) `#(,x ,@es)))))
@@ -215,13 +203,22 @@
     (string->symbol
       (string-append "_" "." (number->string n)))))
 
+(define join
+  (lambda (a b)
+    (cond
+      ((null? a) b)
+      ((member (car a) b) (join (cdr a) b))
+      (else (join (cdr a) (cons (car a) b))))))
+(define reified-sort
+  (lambda (x)
+    (sort (lambda (s1 s2) (string<? (format "~a" s1) (format "~a" s2))) (join x '()))))
 (define reify-some-constraints
   (lambda (tag C->c)
     (lambda (s r others)
       (let ((cs (filter (lambda (x) (null? (tree-collect (lambda (v) (var? v)) x '()))) (map (lambda (x) (walk* x r)) (C->c (s->C s))))))
         (if (null? cs)
           others
-          (cons (cons tag (sort (lambda (s1 s2) (string<? (format "~a" s1) (format "~a" s2))) (join cs '())))
+          (cons (cons tag (reified-sort cs))
             others))))))
 (define reify-symbol-constraints
   (reify-some-constraints 'sym C->symbol))
@@ -243,12 +240,26 @@
           (reify-!in-constraints s r
             (reify-union-constraints s r
               (reify-disj-constraints s r '()))))))))
+(define normalize-all-reified-sets
+  (lambda (x)
+    (cond
+      ((empty-set? x) empty-set)
+      ((non-empty-set? x)
+       (let ((v (map normalize-all-reified-sets (vector->list x))))
+         (let ((v (vector->list (normalize-set (car v) (cdr v) empty-s))))
+           `#(,(car v) ,@(reified-sort (cdr v))))))
+      ((pair? x)
+       (cons
+         (normalize-all-reified-sets (car x))
+         (normalize-all-reified-sets (cdr x))))
+      (else x))))
 (define reify
   (lambda (v s)
     (let* ((v (walk* v s))
            (r (reify-s v empty-s))
            (vr (walk* v r))
-           (Cr (filter (lambda (id) id) (reify-constraints s r))))
+           (Cr (filter (lambda (id) id) (reify-constraints s r)))
+           (vr (normalize-all-reified-sets vr)))
       (if (null? Cr)
         vr
         `(,vr : ,@Cr)))))
