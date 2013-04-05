@@ -59,6 +59,12 @@
       ((null? a) b)
       ((member (car a) b) (join (cdr a) b))
       (else (join (cdr a) (cons (car a) b))))))
+(define joinq
+  (lambda (a b)
+    (cond
+      ((null? a) b)
+      ((memq (car a) b) (join (cdr a) b))
+      (else (join (cdr a) (cons (car a) b))))))
 (define normalize-set
   (lambda (x es s)
     (cond
@@ -66,7 +72,7 @@
       ((non-empty-set? x) (let ((v (vector->list x)))
                             (normalize-set
                               (walk (car v) s)
-                              (join (reverse (cdr v)) es)
+                              (joinq (reverse (cdr v)) es)
                               s)))
       ((and (var? x) (not (null? es))) `#(,x ,@es))
       ((and (symbol? x) (not (null? es))) `#(,x ,@es)))))
@@ -533,7 +539,7 @@
                   ((ino n v) (!ino n u))
                   ((== u empty-set) (=/= v empty-set))))))
           (else
-            (with-C s (with-C-=/= (s->C s) (join `((,u ,v)) (C->=/= (s->C s)))))))))))
+            (with-C s (with-C-=/= (s->C s) (cons `(,u ,v) (C->=/= (s->C s)))))))))))
 
 (define !ino
   (lambda (t x)
@@ -554,7 +560,7 @@
               ((and (var? x) (occurs-check x t s))
                 s)
               (else
-                (with-C s (with-C-!in (s->C s) (join `((,t ,x)) (C->!in (s->C s)))))))))))))
+                (with-C s (with-C-!in (s->C s) (cons `(,t ,x) (C->!in (s->C s)))))))))))))
 
 (define uniono
   (lambda (x y z)
@@ -607,7 +613,7 @@
                             (!ino tx n2)
                             (uniono n1 n2 n)))))))))
               ;; NOTE cases (6) and (7) in Fig. 7 are handled in =/=
-              (else (with-C s (with-C-union (s->C s) (join `((,x ,y ,z)) (C->union (s->C s)))))))))))))
+              (else (with-C s (with-C-union (s->C s) (cons `(,x ,y ,z) (C->union (s->C s)))))))))))))
 
 (define disjo
   (lambda (x y)
@@ -643,7 +649,7 @@
                      (disjo rx ry)))))
               (else
                 (assert (and (var? x) (var? y)))
-                (with-C s (with-C-disj (s->C s) (join `((,x ,y)) (C->disj (s->C s)))))))))))))
+                (with-C s (with-C-disj (s->C s) (cons `(,x ,y) (C->disj (s->C s)))))))))))))
 
 (define !uniono
   (lambda (x y z)
@@ -684,7 +690,7 @@
                   (lambda (y) (eq? x (walk y s)))
                   (C->symbol (s->C s)))
               #f
-              (with-C s (with-C-set (s->C s) (join `(,x) (C->set (s->C s)))))))
+              (with-C s (with-C-set (s->C s) (cons x (C->set (s->C s)))))))
           ((empty-set? x) s)
           ((non-empty-set? x) (bind s (seto (vector-ref x 0))))
           (else #f))))))
@@ -699,7 +705,7 @@
                   (lambda (y) (eq? x (walk y s)))
                   (C->set (s->C s)))
               #f
-              (with-C s (with-C-symbol (s->C s) (join `(,x) (C->symbol (s->C s)))))))
+              (with-C s (with-C-symbol (s->C s) (cons x (C->symbol (s->C s)))))))
           ((symbol? x) s)
           (else #f))))))
 
