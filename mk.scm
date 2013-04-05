@@ -511,8 +511,7 @@
               (conde
                 ((=/= (car u) (car v)))
                 ((=/= (cdr u) (cdr v))))))
-          ((eq? u v)
-           #f)
+          ((eq? u v) #f)
           ((and (atom? u) (atom? v))
            (if (equal? u v)
              #f
@@ -539,6 +538,10 @@
                (conde
                  ((ino n u) (!ino n v))
                  ((ino n v) (!ino n u))))))
+          ((or ;; case seems to be missing from Fig. 5 (?)
+             (and (non-empty-set? u) (empty-set? v))
+             (and (non-empty-set? v) (empty-set? u)))
+            #f)
           ;; NOTE handling cases (6) and (7) of uniono (Fig. 7)
           ((and (var? u)
              (exists
