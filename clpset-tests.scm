@@ -1,29 +1,5 @@
 (load "mk.scm")
-
-(define-syntax test-check
-  (syntax-rules ()
-    ((_ title tested-expression expected-result)
-     (begin
-       (cout "Testing " title nl)
-       (let* ((expected expected-result)
-              (produced tested-expression))
-         (or (equal? expected produced)
-             (errorf 'test-check
-               "Failed: ~a~%Expected: ~a~%Computed: ~a~%"
-               'tested-expression expected produced)))))))
-
-(define nl (string #\newline))
-
-(define (cout . args)
-  (for-each (lambda (x)
-              (if (procedure? x) (x) (display x)))
-            args))
-
-(define errorf
-  (lambda (tag . args)
-    (printf "Failed: ~s: ~%" tag)
-    (apply printf args)
-    (error 'WiljaCodeTester "That's all, folks!")))
+(load "test-check.scm")
 
 (test-check "normalize-set-1"
   (normalize-set empty-set '() empty-s)
