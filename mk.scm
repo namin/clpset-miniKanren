@@ -401,7 +401,6 @@
                     (car u) (car v) s)))
            (and s (unify
                     (cdr u) (cdr v) s))))
-        ((equal? u v) s)
         ((non-empty-set? v)
           (let* ((vns (normalize-set v '() s))
                  (x (set-tail vns)))
@@ -447,6 +446,7 @@
                                 ((loopj (+ j 1)))))
                             fail))))))))
               (else #f))))
+        ((equal? u v) s)
         (else #f)))))
 
 (define ==
@@ -520,6 +520,20 @@
                (conde
                  ((ino n u) (!ino n v))
                  ((ino n v) (!ino n u))))))
+          ;; NOTE handling cases (6) and (7) of uniono (Fig. 7)
+          ((and (var? u)
+             (exists
+               (lambda (c)
+                 (and
+                   (exists (lambda (x) (eq? u (walk x s))) c)
+                   (not (eq? (walk (car c) s) (walk (cadr c) s)))))
+               (C->union (s->C s))))
+            (bind s
+              (fresh (n)
+                (conde
+                  ((ino n u) (!ino n v))
+                  ((ino n v) (!ino n u))
+                  ((== u empty-set) (=/= v empty-set))))))
           (else
             (with-C s (with-C-=/= (s->C s) (join `((,u ,v)) (C->=/= (s->C s)))))))))))
 
@@ -594,7 +608,7 @@
                             (== y `#(,n2 ,tx))
                             (!ino tx n2)
                             (uniono n1 n2 n)))))))))
-              ;; skipping cases (6) and (7) in Fig. 7
+              ;; NOTE cases (6) and (7) in Fig. 7 are handled in =/=
               (else (with-C s (with-C-union (s->C s) (join `((,x ,y ,z)) (C->union (s->C s)))))))))))))
 
 (define disjo

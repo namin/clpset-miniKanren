@@ -110,3 +110,30 @@ nun(X,Y,{a,b}).
 
 ndisj({a},{X,b}).
 % X = a
+
+un(X,Y,Z) & Z neq {}.
+% X = {_1\_2},
+% Z = {_1\_3}
+% Constraint:[_1 nin _3,_1 nin _2,_1 nin Y,un(_2,Y,_3),set(Y),set(_3)]
+%
+% Y = {_1\_2},
+% Z = {_1\_3}
+% Constraint:[_1 nin _3,_1 nin _2,_1 nin X,un(X,_2,_3),set(X),set(_3)]
+%
+% X = {_1\_2},
+% Y = {_1\_4},
+% Z = {_1\_3}
+% Constraint:[_1 nin _3,_1 nin _2,_1 nin _4,un(_2,_4,_3),set(_3)]
+%
+% X = {_1\_4},
+% Z = {_1\_5}
+% Constraint:[_1 nin _5,_1 nin _4,_1 nin Y,un(_4,Y,_5),set(Y)]
+%
+% Y = {_1\_4},
+% Z = {_1\_5}
+% Constraint:[_1 nin _5,_1 nin _4,_1 nin X,un(X,_4,_5),set(X)]
+%
+% X = {_1\_4},
+% Y = {_1\_6},
+% Z = {_1\_5}
+% Constraint:[_1 nin _5,_1 nin _4,_1 nin _6,un(_4,_6,_5)]
