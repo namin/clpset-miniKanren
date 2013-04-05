@@ -1,58 +1,42 @@
 (load "mk.scm")
 (load "test-check.scm")
 
-(test-check "normalize-set-1"
-  (normalize-set empty-set '() empty-s)
-  empty-set)
-
-(test-check "normalize-set-2"
-  (normalize-set `#(,empty-set 1 2) '() empty-s)
-  `#(,empty-set 1 2))
-
-(test-check "normalize-set-3"
-  (normalize-set `#(#(,empty-set 1) 2) '() empty-s)
-  `#(,empty-set 1 2))
-
-(test-check "normalize-set-4"
-  (normalize-set `#(#(,(var 'x) 1) 2) '() empty-s)
-  `#(,(var 'x) 1 2))
-
 ;;; feature complete wrt to paper!
 
 (test-check "set-run-eq-1"
-  (run* (q) (== q `#(,q 1)))
-  '((#(_.0 1) : (set _.0))))
+  (run* (q) (== q (set q 1)))
+  '(((set _.0 1) : (set _.0))))
 
 (test-check "set-run-eq-2"
-  (run* (q) (== q `#(,q 1)) (== q `#(,q 2)))
+  (run* (q) (== q (set q 1)) (== q (set q 2)))
   ;; TODO: why 5 times, in {log}, it's only 4
-  '((#(_.0 1 2) : (set _.0))
-    (#(_.0 1 2) : (set _.0))
-    (#(_.0 1 2) : (set _.0))
-    (#(_.0 1 2) : (set _.0))
-    (#(_.0 1 2) : (set _.0))))
+  '(((set _.0 1 2) : (set _.0))
+    ((set _.0 1 2) : (set _.0))
+    ((set _.0 1 2) : (set _.0))
+    ((set _.0 1 2) : (set _.0))
+    ((set _.0 1 2) : (set _.0))))
 
 (test-check "set-run-eq-3"
-  (run* (q) (fresh (x y r s) (== q `(,x ,y ,r ,s)) (== `#(,r ,x) `#(,s ,y))))
+  (run* (q) (fresh (x y r s) (== q `(,x ,y ,r ,s)) (== (set r x) (set s y))))
   '(((_.0 _.0 _.1 _.1) : (set _.1))
-    ((_.0 _.0 _.1 #(_.1 _.0)) : (set _.1))
-    ((_.0 _.0 #(_.1 _.0) _.1) : (set _.1))
-    ((_.0 _.1 #(_.2 _.1) #(_.2 _.0)) : (set _.2))))
+    ((_.0 _.0 _.1 (set _.1 _.0)) : (set _.1))
+    ((_.0 _.0 (set _.1 _.0) _.1) : (set _.1))
+    ((_.0 _.1 (set _.2 _.1) (set _.2 _.0)) : (set _.2))))
 
 (test-check "set-run-eq-4"
-  (run* (q) (fresh (z) (== q `#(,q #(,z 1)))))
-  '((#(_.0 #(_.1 1)) : (set  _.0 _.1))))
+  (run* (q) (fresh (z) (== q (set q (set z 1)))))
+  '(((set _.0 (set _.1 1)) : (set  _.0 _.1))))
 
 (test-check "set-run-ino-1"
-  (run* (q) (fresh (x y z) (== q `(,x ,y ,z)) (ino 'a `#(,z ,x b ,y))))
+  (run* (q) (fresh (x y z) (== q `(,x ,y ,z)) (ino 'a (set z x 'b y))))
   '(((a _.0 _.1) : (set _.1))
     ((_.0 a _.1) : (set _.1))
-    ((_.0 _.1 #(_.2 a)) : (set _.2))))
+    ((_.0 _.1 (set _.2 a)) : (set _.2))))
 
 (test-check "set-run-neq-1"
   (run* (q) (fresh (x y)
               (== q `(,x ,y))
-              (=/= `(f a #(,empty-set b c)) `(f ,x #(,empty-set ,x ,y)))))
+              (=/= `(f a ,(set ∅ 'b 'c)) `(f ,x ,(set ∅ x y)))))
   '(((_.0 _.1) : (=/= (_.0 a)))
     ((_.0 _.1) : (=/= (_.0 b) (_.1 b)))
     ((_.0 _.1) : (=/= (_.0 b) (_.0 c)))
@@ -60,25 +44,25 @@
     ((_.0 _.1) : (=/= (_.1 b) (_.1 c)))))
 
 (test-check "set-run-neq-2"
-  (run* (q) (=/= `#(,q c) `#(,empty-set b c)))
+  (run* (q) (=/= (set q 'c) (set ∅ 'b 'c)))
   '((_.0 : (set _.0) (!in (b _.0)))
-    (#(_.0 _.1) : (set _.0) (=/= (_.1 b) (_.1 c)))))
+    ((set _.0 _.1) : (set _.0) (=/= (_.1 b) (_.1 c)))))
 
 (test-check "set-run-union-1"
   (run* (q) (fresh (x y z v)
               (== q `(,x ,y ,z ,v))
-              (uniono `#(,empty-set ,x) `#(,z ,y) v)))
-  '(((_.0 _.1 _.2 #(_.2 _.0 _.1)) :
+              (uniono (set ∅ x) (set z y) v)))
+  '(((_.0 _.1 _.2 (set _.2 _.0 _.1)) :
       (set _.2)
       (=/= (_.1 _.0))
       (!in (_.0 _.2)))
-    ((_.0 _.0 _.1 #(_.1 _.0)) :
+    ((_.0 _.0 _.1 (set _.1 _.0)) :
       (set _.1)
       (!in (_.0 _.1)))
-    ((_.0 _.0 #(_.1 _.0) #(_.1 _.0)) :
+    ((_.0 _.0 (set _.1 _.0) (set _.1 _.0)) :
       (set _.1)
       (!in (_.0 _.1)))
-    ((_.0 _.1 #(_.2 _.0) #(_.2 _.0 _.1)) :
+    ((_.0 _.1 (set _.2 _.0) (set _.2 _.0 _.1)) :
       (set _.2)
       (=/= (_.1 _.0))
       (!in (_.0 _.2)))))
@@ -88,14 +72,14 @@
     (run* (q)
       (fresh (x y z v)
         (== q `(,x ,y ,z ,v))
-        (uniono `#(,empty-set cat ,x ,y) `#(,empty-set dog bird ,z) v))))
+        (uniono (set ∅ 'cat x y) (set ∅ 'dog 'bird z) v))))
   57)
 
 (test-check "set-run-disj-1"
   (run* (q)
     (fresh (x y z)
       (== q `(,x ,y ,z))
-      (disjo `#(,empty-set ,x ,y) `#(,z a))))
+      (disjo (set ∅ x y) (set z 'a))))
   '(((_.0 _.1 _.2) :
       (set _.2)
       (=/= (_.0 a) (_.1 a))
@@ -105,14 +89,14 @@
   (run* (q)
     (fresh (x y)
       (== q `(,x ,y))
-      (!uniono x y `#(,empty-set a b))))
+      (!uniono x y (set ∅ 'a 'b))))
   '(((_.0 _.1) : (set _.0 _.1) (!in (a _.0) (a _.1)))
     ((_.0 _.1) : (set _.0 _.1) (!in (b _.0) (b _.1)))
-    ((#(_.0 _.1) _.2) : (set _.0 _.2) (=/= (_.1 a) (_.1 b)))
-    ((_.0 #(_.1 _.2)) : (set _.0 _.1) (=/= (_.2 a) (_.2 b)))))
+    (((set _.0 _.1) _.2) : (set _.0 _.2) (=/= (_.1 a) (_.1 b)))
+    ((_.0 (set _.1 _.2)) : (set _.0 _.1) (=/= (_.2 a) (_.2 b)))))
 
 (test-check "set-run-not-disj-1"
-  (run* (q) (!disjo `#(,empty-set a) `#(,empty-set ,q b)))
+  (run* (q) (!disjo (set ∅ 'a) (set ∅ q 'b)))
   '(a))
 
 (test-check "set-run-union-neq-1"
@@ -121,27 +105,27 @@
       (== q `(,x ,y ,z))
       (uniono x y z)
       (=/= z empty-set)))
-  '(((#(_.0 _.1) _.2 #(_.3 _.1)) :
+  '((((set _.0 _.1) _.2 (set _.3 _.1)) :
       (set _.0 _.2 _.3)
       (!in (_.1 _.0) (_.1 _.3))
       (union [_.0 _.2 _.3]))
-   ((_.0 #(_.1 _.2) #(_.3 _.2)) :
+   ((_.0 (set _.1 _.2) (set _.3 _.2)) :
      (set _.0 _.1 _.3)
      (!in (_.2 _.1) (_.2 _.3))
      (union [_.0 _.1 _.3]))
-   ((#(_.0 _.1) #(_.2 _.1) #(_.3 _.1)) :
+   (((set _.0 _.1) (set _.2 _.1) (set _.3 _.1)) :
      (set _.0 _.2 _.3)
      (!in (_.1 _.0) (_.1 _.2) (_.1 _.3))
      (union [_.0 _.2 _.3]))
-   ((#(_.0 _.1) _.2 #(_.3 _.1)) :
+   (((set _.0 _.1) _.2 (set _.3 _.1)) :
      (set _.0 _.2 _.3)
      (!in (_.1 _.0) (_.1 _.3))
      (union [_.0 _.2 _.3]))
-   ((_.0 #(_.1 _.2) #(_.3 _.2)) :
+   ((_.0 (set _.1 _.2) (set _.3 _.2)) :
      (set _.0 _.1 _.3)
      (!in (_.2 _.1) (_.2 _.3))
      (union [_.0 _.1 _.3]))
-   ((#(_.0 _.1) #(_.2 _.1) #(_.3 _.1)) :
+   (((set _.0 _.1) (set _.2 _.1) (set _.3 _.1)) :
      (set _.0 _.2 _.3)
      (!in (_.1 _.0) (_.1 _.2) (_.1 _.3))
      (union [_.0 _.2 _.3]))))
@@ -169,7 +153,7 @@
 (test-check "set-run-symbolo-3"
   (run* (q)
     (symbolo q)
-    (== q `#(,q x)))
+    (== q (set q 'x)))
   '())
 
 (test-check "set-run-symbolo-3"
@@ -177,3 +161,21 @@
     (symbolo q)
     (seto q))
   '())
+
+;;; implementation tests
+
+(test-check "normalize-set-1"
+  (normalize-set empty-set '() empty-s)
+  empty-set)
+
+(test-check "normalize-set-2"
+  (normalize-set `#(,empty-set 1 2) '() empty-s)
+  `#(,empty-set 1 2))
+
+(test-check "normalize-set-3"
+  (normalize-set `#(#(,empty-set 1) 2) '() empty-s)
+  `#(,empty-set 1 2))
+
+(test-check "normalize-set-4"
+  (normalize-set `#(#(,(var 'x) 1) 2) '() empty-s)
+  `#(,(var 'x) 1 2))

@@ -50,6 +50,10 @@
 (define empty-s '(() (() () () () () ())))
 
 (define empty-set '#())
+(define ∅ empty-set)
+(define set
+  (lambda (base . elems)
+    `#(,base ,@elems)))
 (define empty-set? (lambda (x) (and (vector? x) (= (vector-length x) 0))))
 (define non-empty-set? (lambda (x) (and (vector? x) (> (vector-length x) 1))))
 (define set? (lambda (x) (or (empty-set? x) (non-empty-set? x))))
@@ -243,11 +247,11 @@
 (define normalize-all-reified-sets
   (lambda (x)
     (cond
-      ((empty-set? x) empty-set)
+      ((empty-set? x) '∅)
       ((non-empty-set? x)
        (let ((v (map normalize-all-reified-sets (vector->list x))))
          (let ((v (vector->list (normalize-set (car v) (cdr v) empty-s))))
-           `#(,(car v) ,@(reified-sort (cdr v))))))
+           `(set ,(car v) ,@(reified-sort (cdr v))))))
       ((pair? x)
        (cons
          (normalize-all-reified-sets (car x))
@@ -258,11 +262,11 @@
     (let* ((v (walk* v s))
            (r (reify-s v empty-s))
            (vr (walk* v r))
-           (Cr (filter (lambda (id) id) (reify-constraints s r)))
-           (vr (normalize-all-reified-sets vr)))
-      (if (null? Cr)
-        vr
-        `(,vr : ,@Cr)))))
+           (Cr (filter (lambda (id) id) (reify-constraints s r))))
+      (normalize-all-reified-sets
+        (if (null? Cr)
+          vr
+          `(,vr : ,@Cr))))))
 
 (define-syntax mzero
   (syntax-rules () ((_) #f)))
