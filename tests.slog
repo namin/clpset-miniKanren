@@ -1,3 +1,15 @@
+%% {log} tests
+%%
+%% using older release of {log}, which is closer to paper description
+%% get it from http://www.math.unipr.it/~gianfr/SETLOG/setlog_4_3.pl
+%%
+%% to get to the {log} prompt, in prolog:
+%%
+%% ?- consult(setlog_4_3).
+%% ?- start.
+%%
+%% then all these examples should run as advertised.
+
 X={x\X}.
 % X = {x\_1}
 % Constraint: set(_1)
@@ -61,9 +73,6 @@ f(a, {b,c}) neq f(X, {X,Y}).
 % true
 % Constraint: b nin X, set(X)
 
-%% NOTE: switching to older release of {log},
-%%       closer to paper description
-%% http://www.math.unipr.it/~gianfr/SETLOG/setlog_4_3.pl
 un({X},{Y\Z},V).
 % V = {X,Y\Z}
 % Constraint:[X neq Y,X nin Z,set(Z)]
