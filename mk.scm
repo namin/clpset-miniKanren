@@ -490,10 +490,12 @@
               (conde
                 ((=/= (car u) (car v)))
                 ((=/= (cdr u) (cdr v))))))
-          ((equal? u v)
+          ((eq? u v)
            #f)
           ((and (atom? u) (atom? v))
-           s)
+           (if (equal? u v)
+             #f
+             s))
           ((and (var? u) (occurs-check u v s))
            (if (non-empty-set? v)
              (let* ((vns (normalize-set v '() s))
