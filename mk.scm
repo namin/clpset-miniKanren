@@ -52,8 +52,8 @@
 (define empty-set '#())
 (define ∅ empty-set)
 (define set
-  (lambda (base . elems)
-    `#(,base ,@elems)))
+  (lambda (base e0 . elems)
+    `#(,base ,e0 ,@elems)))
 (define empty-set? (lambda (x) (and (vector? x) (= (vector-length x) 0))))
 (define non-empty-set? (lambda (x) (and (vector? x) (> (vector-length x) 1))))
 (define set? (lambda (x) (or (empty-set? x) (non-empty-set? x))))
@@ -541,7 +541,7 @@
           ((or ;; case seems to be missing from Fig. 5 (?)
              (and (non-empty-set? u) (empty-set? v))
              (and (non-empty-set? v) (empty-set? u)))
-            #f)
+            s)
           ;; NOTE handling cases (6) and (7) of uniono (Fig. 7)
           ((and (var? u)
              (exists

@@ -9,7 +9,7 @@
 (define typ-rcd
   (lambda (r)
     (conde
-      ((== ∅ r))
+      ((== r ∅))
       ((fresh (l ty rr)
          (== r (set rr `(,l ,ty)))
          (symbolo l)
@@ -20,7 +20,7 @@
 (define label-!in
   (lambda (l r)
     (conde
-      ((== ∅ r))
+      ((== r ∅))
       ((fresh (ol oty rr)
          (== r (set rr `(,ol ,oty)))
          (=/= ol l)
@@ -39,21 +39,21 @@
        (fresh (r1 r2)
          (== `(rcd ,r1) ty1)
          (== `(rcd ,r2) ty2)
-         (sub-record r1 r2))))))
+         (sub-rcd r1 r2))))))
 
-(define sub-record
+(define sub-rcd
   (lambda (r1 r2)
     (conde
-      ((== r2 empty-set)
+      ((== r2 ∅)
        (typ-rcd r1))
       ((fresh (l ty2 rr2 ty1 rr1)
          (== r2 (set rr2 `(,l ,ty2)))
          (== r1 (set rr1 `(,l ,ty1)))
          (symbolo l)
-         (sub ty1 ty2)
          (label-!in l rr2)
          (label-!in l rr1)
-         (sub-record rr1 rr2))))))
+         (sub ty1 ty2)
+         (sub-rcd rr1 rr2))))))
 
 '(
    (run 10 (q)
