@@ -51,3 +51,15 @@
 (test-check "tc-new-1"
   (run* (q) (tc `(new ,(set ∅ `(foo (lambda (x) x)))) ∅ q))
   '((rcd (set ∅ (foo (arr _.0 _.0))))))
+
+(test-check "tc-sel-1"
+  (car (run* (q) (tc `(sel (new ,(set ∅ `(foo (lambda (x) x)))) foo) ∅ q)))
+  '(arr _.0 _.0))
+
+(test-check "tc-sel-2"
+  (car (run* (q) (tc `(app (lambda (x) (sel x foo)) (new ,(set ∅ `(foo (lambda (x) x))))) ∅ q)))
+  '(arr _.0 _.0))
+
+(test-check "tc-sel-3"
+  (car (run* (q) (tc `(app (lambda (x) (sel x foo)) (new ,(set ∅ `(foo (lambda (x) x)) `(bar (lambda (x) x))))) ∅ q)))
+  '(arr _.0 _.0))

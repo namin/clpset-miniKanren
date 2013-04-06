@@ -35,6 +35,18 @@
          (=/= ol l)
          (label-!ino l rr))))))
 
+(define label-ino
+  (lambda (l r)
+    (conde
+      ((== r ∅))
+      ((fresh (ol oty rr)
+         (== r (set rr `(,ol ,oty)))
+         (!ino `(,ol ,oty) rr)
+         (conde
+           ((== ol l))
+           ((=/= ol l)
+            (label-ino l rr))))))))
+
 '(
    (run 100 (q) (typ-rcd q))
  )
@@ -102,7 +114,8 @@
       (symbolo x)
       (=/= x 'app)
       (=/= x 'lambda)
-      (=/= x 'new))))
+      (=/= x 'new)
+      (=/= x 'sel))))
 
 (define exp
   (lambda (e bvars)
@@ -119,28 +132,25 @@
       ((fresh (e1 e2)
          (== `(app ,e1 ,e2) e)
          (exp e1 bvars)
-         (exp e2 bvars))))))
+         (exp e2 bvars)))
+      ((fresh (eo label)
+         (== `(sel ,eo ,label) e)
+         (symbolo label)
+         (exp eo bvars))))))
 
 (define exp-rcd
   (lambda (r bvars) (f-rcd (lambda (e) (exp e bvars)) r)))
 
 '(
+   (run 100 (q) (exp q ∅))
    (run 100 (q) (exp-rcd q ∅))
  )
 
 (define bound-vars-ofo labelso)
 
-(define bound-ino
-  (lambda (x env)
-    (fresh (bvars)
-      (bound-vars-ofo env bvars)
-      (ino x bvars))))
+(define bound-ino label-ino)
 
-(define !bound-ino
-  (lambda (x env)
-    (fresh (bvars)
-      (bound-vars-ofo env bvars)
-      (!ino x bvars))))
+(define !bound-ino label-!ino)
 
 (define lookupo
   (lambda (x env ty)
@@ -169,7 +179,12 @@
       ((fresh (re rt)
          (== `(new ,re) e)
          (== `(rcd ,rt) ty)
-         (tc-rcd re env rt))))))
+         (tc-rcd re env rt)))
+      ((fresh (obj rt label)
+         (== `(sel ,obj ,label) e)
+         (symbolo label)
+         (ino `(,label ,ty) rt)
+         (tc obj env `(rcd ,rt)))))))
 
 (define tc-rcd
   (lambda (re env rt)
