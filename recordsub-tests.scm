@@ -27,3 +27,7 @@
 (test-check "fail-sub-1"
   (run* (q) (sub `(rcd ,(set ∅ `(a (rcd ,∅)))) `(rcd ,(set ∅ `(a (rcd ,∅)) `(b (rcd ,∅))))))
   '())
+
+(test-check "sub-x-bot-is-bot"
+  (run* (q) (sub q 'bot))
+  '(bot))
