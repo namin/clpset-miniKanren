@@ -31,3 +31,27 @@
 (test-check "sub-x-bot-is-bot"
   (run* (q) (sub q 'bot))
   '(bot))
+
+(test-check "tc-id"
+  (run* (q) (tc `(lambda (x) x) ∅ q))
+  `((arr _.0 _.0)))
+
+(test-check "tc-lam-2"
+  (run 1 (q) (tc `(lambda (x) (lambda (y) x)) ∅ q))
+  '((arr _.0 (arr _.1 _.0))))
+
+(test-check "tc-lam-3"
+  (run 1 (q) (tc `(lambda (x) (lambda (y) y)) ∅ q))
+  '((arr _.0 (arr _.1 _.1))))
+
+(test-check "tc-app-1"
+  (run 1 (q) (tc `(lambda (f) (lambda (x) (app f x))) ∅ q))
+  '((arr (arr _.0 _.1) (arr _.0 _.1))))
+
+(test-check "tc-new-0"
+  (run* (q) (tc `(new ,∅) ∅ q))
+  '((rcd ∅)))
+
+(test-check "tc-new-1"
+  (run* (q) (tc `(new ,(set ∅ `(foo (lambda (x) x)))) ∅ q))
+  '((rcd (set ∅ (foo (arr _.0 _.0))))))
