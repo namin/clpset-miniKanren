@@ -100,20 +100,6 @@
        (sub ty1 ty2)))
  )
 
-(define empty-env
-  `(,∅ ()))
-
-(define bound-vars-ofo
-  (lambda (env bvars)
-    (fresh (envl)
-      (== `(,bvars ,envl) env))))
-
-(define bound-ino
-  (lambda (x env)
-    (fresh (bvars)
-      (bound-vars-ofo env bvars)
-      (ino x bvars))))
-
 (define exp
   (lambda (e bvars)
     (conde
@@ -125,11 +111,81 @@
          (exp body (set bvars x))))
       ((fresh (r)
          (== `(new ,r) e)
-         (exp-rcd r bvars))))))
+         (exp-rcd r bvars)))
+      ((fresh (e1 e2)
+         (== `(app ,e1 ,e2) e)
+         (exp e1 bvars)
+         (exp e2 bvars))))))
 
 (define exp-rcd
   (lambda (r bvars) (f-rcd (lambda (e) (exp e bvars)) r)))
 
 '(
    (run 100 (q) (exp-rcd q ∅))
+ )
+
+(define empty-env ∅)
+
+(define bound-vars-ofo labelso)
+
+(define bound-ino
+  (lambda (x env)
+    (fresh (bvars)
+      (bound-vars-ofo env bvars)
+      (ino x bvars))))
+
+(define !bound-ino
+  (lambda (x env)
+    (fresh (bvars)
+      (bound-vars-ofo env bvars)
+      (!ino x bvars))))
+
+(define lookupo
+  (lambda (x env ty)
+    (fresh (y v rest)
+      (== env (set rest `(,y ,v)))
+      (!ino `(,y ,v) rest)
+      (conde
+        ((== y x) (== v ty))
+        ((=/= y x)
+         (lookupo x rest ty))))))
+
+(define tc
+  (lambda (e env ty)
+    (conde
+      ((symbolo e)
+       (lookupo e env ty))
+      ((fresh (x body ty-x ty-body)
+         (== `(lambda (,x) ,body) e)
+         (symbolo x)
+         (!bound-ino 'lambda env)
+         (== `(arr ,ty-x ,ty-body) ty)
+         (tc body (set env `(,x ,ty-x)) ty-body)))
+      ((fresh (rator rand ty-rand)
+         (== `(app ,rator ,rand) exp)
+         (!bound-ino 'app env)
+         (tc rator env `(arr ,ty-rand ,ty))
+         (tc rand env ty-rand)))
+      ((fresh (re rt)
+         (== `(new ,re) exp)
+         (== `(rcd ,rt) ty)
+         (!bound-ino 'new env)
+         (tc-rcd re env rt))))))
+
+(define tc-rcd
+  (lambda (re env rt)
+    (conde
+      ((== re ∅)
+       (== rt ∅))
+      ((fresh (l e ty rre rrt)
+         (== re (set rre `(,l ,e)))
+         (== rt (set rrt `(,l ,ty)))
+         (!ino `(,l ,e) rre)
+         (!ino `(,l ,ty) rrt)
+         (tc e env ty)
+         (tc-rcd rre env rrt))))))
+
+'(
+   (run 100 (q) (fresh (e ty) (== q `(,e ,ty)) (tc e ∅ ty)))
+   (run 10 (q) (fresh (re rt) (== q `(,re ,rt)) (tc-rcd re ∅ rt)))
  )
