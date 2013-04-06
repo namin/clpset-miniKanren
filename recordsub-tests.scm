@@ -9,10 +9,10 @@
   (run 1 (q) (sub `(rcd ,(set ∅ `(a (rcd ,∅)) `(b (rcd ,∅)))) `(rcd ,(set ∅ `(a (rcd ,∅))))))
   '(_.0))
 
-(test-check "sub-empty-x-is-empty-or-top"
+(test-check "sub-empty-x-is-empty"
   (run* (q)
     (sub `(rcd ,∅) q))
-  '((rcd ∅) top))
+  '((rcd ∅)))
 
 (test-check "sub-rcd-empty-x-is-empty"
   (run* (q)
@@ -21,16 +21,12 @@
 
 (test-check "sub-1-x-is"
  (run* (q)
-    (sub `(rcd ,(set ∅ `(a top))) q))
-  '((rcd (set ∅ (a top))) top (rcd ∅)))
+    (sub `(rcd ,(set ∅ `(a (rcd ,∅)))) q))
+  '((rcd (set ∅ (a (rcd ∅)))) (rcd ∅)))
 
 (test-check "fail-sub-1"
   (run* (q) (sub `(rcd ,(set ∅ `(a (rcd ,∅)))) `(rcd ,(set ∅ `(a (rcd ,∅)) `(b (rcd ,∅))))))
   '())
-
-(test-check "sub-x-bot-is-bot"
-  (run* (q) (sub q 'bot))
-  '(bot))
 
 (test-check "tc-id"
   (run* (q) (tc `(lambda (x) x) ∅ q))

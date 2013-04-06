@@ -3,8 +3,6 @@
 (define typ
   (lambda (ty)
     (conde
-      ((== 'top ty))
-      ((== 'bot ty))
       ((fresh (ty1 ty2)
          (== `(arr ,ty1 ,ty2) ty)
          (typ ty1)
@@ -60,12 +58,6 @@
        )
       ((=/= ty1 ty2)
        (conde
-         ((== 'top ty2)
-          ;;;(typ ty1)
-         )
-         ((== 'bot ty1)
-          ;;;(typ ty2)
-         )
          ((fresh (tya1 tyb1 tya2 tyb2)
             (== `(arr ,tya1 ,tyb1) ty1)
             (== `(arr ,tya2 ,tyb2) ty2)
@@ -104,10 +96,18 @@
        (sub ty1 ty2)))
  )
 
+(define varo
+  (lambda (x)
+    (fresh ()
+      (symbolo x)
+      (=/= x 'app)
+      (=/= x 'lambda)
+      (=/= x 'new))))
+
 (define exp
   (lambda (e bvars)
     (conde
-      ((symbolo e)
+      ((varo e)
        (ino e bvars))
       ((fresh (x body)
          (symbolo x)
@@ -155,23 +155,19 @@
 (define tc
   (lambda (e env ty)
     (conde
-      ((symbolo e)
+      ((varo e)
        (lookupo e env ty))
       ((fresh (x body ty-x ty-body ty-body-actual)
          (== `(lambda (,x) ,body) e)
          (== `(arr ,ty-x ,ty-body) ty)
-         (symbolo x)
-         (!bound-ino 'lambda env)
+         (varo x)
          (tc body (set env `(,x ,ty-x)) ty-body)))
-      ((fresh (rator ty-param rand ty-rand)
+      ((fresh (rator rand ty-rand)
          (== `(app ,rator ,rand) e)
-         (!bound-ino 'app env)
-         (tc rator env `(arr ,ty-param ,ty))
-         (tc rand env ty-rand)
-         (sub ty-rand ty-param)))
+         (tc rator env `(arr ,ty-rand ,ty))
+         (tc rand env ty-rand)))
       ((fresh (re rt)
          (== `(new ,re) e)
-         (!bound-ino 'new env)
          (== `(rcd ,rt) ty)
          (tc-rcd re env rt))))))
 
