@@ -188,8 +188,8 @@
       ((fresh (obj rt label)
          (== `(sel ,obj ,label) e)
          (symbolo label)
-         (ino `(,label ,ty) rt)
-         (tc obj env `(rcd ,rt)))))))
+         (tc obj env `(rcd ,rt))
+         (ino `(,label ,ty) rt))))))
 
 (define tc-rcd
   (lambda (re env rt)
