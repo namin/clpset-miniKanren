@@ -61,9 +61,11 @@
       ((=/= ty1 ty2)
        (conde
          ((== 'top ty2)
-          (typ ty1))
+          ;;;(typ ty1)
+         )
          ((== 'bot ty1)
-          (typ ty2))
+          ;;;(typ ty2)
+         )
          ((fresh (tya1 tyb1 tya2 tyb2)
             (== `(arr ,tya1 ,tyb1) ty1)
             (== `(arr ,tya2 ,tyb2) ty2)
