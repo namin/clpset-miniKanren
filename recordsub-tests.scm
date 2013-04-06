@@ -33,16 +33,16 @@
   `((arr _.0 _.0)))
 
 (test-check "tc-lam-2"
-  (car (run* (q) (tc `(lambda (x) (lambda (y) x)) ∅ q)))
-  '(arr _.0 (arr _.1 _.0)))
+  (run* (q) (tc `(lambda (x) (lambda (y) x)) ∅ q))
+  '((arr _.0 (arr _.1 _.0))))
 
 (test-check "tc-lam-3"
-  (car (run* (q) (tc `(lambda (x) (lambda (y) y)) ∅ q)))
-  '(arr _.0 (arr _.1 _.1)))
+  (run* (q) (tc `(lambda (x) (lambda (y) y)) ∅ q))
+  '((arr _.0 (arr _.1 _.1))))
 
 (test-check "tc-app-1"
-  (car (run* (q) (tc `(lambda (f) (lambda (x) (app f x))) ∅ q)))
-  '(arr (arr _.0 _.1) (arr _.0 _.1)))
+  (run* (q) (tc `(lambda (f) (lambda (x) (app f x))) ∅ q))
+  '((arr (arr _.0 _.1) (arr _.0 _.1))))
 
 (test-check "tc-new-0"
   (run* (q) (tc `(new ,∅) ∅ q))

@@ -146,36 +146,41 @@
    (run 100 (q) (exp-rcd q ∅))
  )
 
-(define bound-vars-ofo labelso)
-
-(define bound-ino label-ino)
-
-(define !bound-ino label-!ino)
+(define envpluso
+  (lambda (x v env env-x)
+    (conde
+      ((== env ∅)
+       (== env-x (set ∅ `(,x ,v))))
+      ((fresh (y vy renv)
+         (== env (set renv `(,y ,vy)))
+         (!ino `(,y ,vy) renv)
+         (conde
+           ((== x y)
+            (envpluso x v renv env-x))
+           ((=/= x y)
+            (fresh (renv-x)
+              (== env-x (set renv-x `(,y ,vy)))
+              (envpluso x v renv renv-x)))))))))
 
 (define lookupo
   (lambda (x env ty)
-    (fresh (y v rest)
-      (== env (set rest `(,y ,v)))
-      (!ino `(,y ,v) rest)
-      (conde
-        ((== y x) (== v ty))
-        ((=/= y x)
-         (lookupo x rest ty))))))
+    (ino `(,x ,ty) env)))
 
 (define tc
   (lambda (e env ty)
     (conde
       ((varo e)
        (lookupo e env ty))
-      ((fresh (x body ty-x ty-body ty-body-actual)
+      ((fresh (x body ty-x ty-body env-x)
          (== `(lambda (,x) ,body) e)
          (== `(arr ,ty-x ,ty-body) ty)
          (varo x)
-         (tc body (set env `(,x ,ty-x)) ty-body)))
+         (envpluso x ty-x env env-x)
+         (tc body env-x ty-body)))
       ((fresh (rator rand ty-rand)
          (== `(app ,rator ,rand) e)
-         (tc rator env `(arr ,ty-rand ,ty))
-         (tc rand env ty-rand)))
+         (tc rand env ty-rand)
+         (tc rator env `(arr ,ty-rand ,ty))))
       ((fresh (re rt)
          (== `(new ,re) e)
          (== `(rcd ,rt) ty)
