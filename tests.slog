@@ -137,3 +137,26 @@ un(X,Y,Z) & Z neq {}.
 % Y = {_1\_6},
 % Z = {_1\_5}
 % Constraint:[_1 nin _5,_1 nin _4,_1 nin _6,un(_4,_6,_5)]
+
+Q = {[a, VA], [b, VB]} & Q = {[L,V]\R} & [L,V] nin R.
+% Q = {[a,VA],[b,VB]},
+% L = a,
+% V = VA,
+% R = {[b,VB]}
+%
+% Q = {[a,VA],[b,VB]},
+% L = a,
+% V = VA,
+% R = {[b,VB]}
+% Constraint:[VA neq VB]
+%
+% Q = {[a,VA],[b,VB]},
+% L = b,
+% V = VB,
+% R = {[a,VA]}
+%
+% Q = {[a,VA],[b,VB]},
+% L = b,
+% V = VB,
+% R = {[a,VA]}
+% Constraint:[VB neq VA]

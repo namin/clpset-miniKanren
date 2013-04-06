@@ -130,6 +130,20 @@
      (!in (_.1 _.0) (_.1 _.2) (_.1 _.3))
      (union [_.0 _.2 _.3]))))
 
+;;; problematic (?) tests, reproduced in {log} too
+
+(test-check "redundant-answers-=/=-pair-case-1"
+  (run* (q)
+    (fresh (va vb r l v)
+      (== q (set ∅ `(a ,va) `(b ,vb)))
+      (== q (set r `(,l ,v)))
+      (!ino `(,l ,v) r)))
+  '((set ∅ (a _.0) (b _.1))
+    ((set ∅ (a _.0) (b _.1)) : (=/= (_.1 _.0))) ;; subsumed
+    (set ∅ (a _.0) (b _.1)) ;; redundant
+    ((set ∅ (a _.0) (b _.1)) : (=/= (_.0 _.1))) ;; subsumed
+     ))
+
 ;;; useful features beyond the paper
 
 ;;; symbolo
