@@ -22,11 +22,10 @@
   '(∅))
 
 (test-check "sub-1-x-is"
-  (run 2 (q) ;; TODO: should be able to change 2 to *
-    (sub `(rcd ,(set ∅ `(a (rcd ,∅)))) q)
-    (typ q))
+ (run* (q)
+    (sub `(rcd ,(set ∅ `(a (rcd ,∅)))) q))
   '((rcd (set ∅ (a (rcd ∅)))) (rcd ∅)))
 
-(test-disable "slow-exhaustive-sub-search-1"
-  (run 1 (q) (sub `(rcd ,(set ∅ `(a (rcd ,∅)))) `(rcd ,(set ∅ `(a (rcd ,∅)) `(b (rcd ,∅))))))
+(test-check "fail-sub-1"
+  (run* (q) (sub `(rcd ,(set ∅ `(a (rcd ,∅)))) `(rcd ,(set ∅ `(a (rcd ,∅)) `(b (rcd ,∅))))))
   '())
