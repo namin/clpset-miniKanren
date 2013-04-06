@@ -13,16 +13,19 @@
          (== `(rcd ,r) ty)
          (typ-rcd r))))))
 
-(define typ-rcd
-  (lambda (r)
+(define f-rcd
+  (lambda (f r)
     (conde
       ((== r ∅))
-      ((fresh (l ty rr)
-         (== r (set rr `(,l ,ty)))
+      ((fresh (l ft rr)
+         (== r (set rr `(,l ,ft)))
          (label-!ino l rr)
          (symbolo l)
-         (typ ty)
-         (typ-rcd rr))))))
+         (f ft)
+         (f-rcd f rr))))))
+
+(define typ-rcd
+  (lambda (r) (f-rcd typ r)))
 
 (define label-!ino
   (lambda (l r)
@@ -95,4 +98,38 @@
        (=/= ty2 `(rcd ,∅))
        (== q `(,ty1 ,ty2))
        (sub ty1 ty2)))
+ )
+
+(define empty-env
+  `(,∅ ()))
+
+(define bound-vars-ofo
+  (lambda (env bvars)
+    (fresh (envl)
+      (== `(,bvars ,envl) env))))
+
+(define bound-ino
+  (lambda (x env)
+    (fresh (bvars)
+      (bound-vars-ofo env bvars)
+      (ino x bvars))))
+
+(define exp
+  (lambda (e bvars)
+    (conde
+      ((symbolo e)
+       (ino e bvars))
+      ((fresh (x body)
+         (symbolo x)
+         (== `(lambda (,x) ,body) e)
+         (exp body (set bvars x))))
+      ((fresh (r)
+         (== `(new ,r) e)
+         (exp-rcd r bvars))))))
+
+(define exp-rcd
+  (lambda (r bvars) (f-rcd (lambda (e) (exp e bvars)) r)))
+
+'(
+   (run 100 (q) (exp-rcd q ∅))
  )
