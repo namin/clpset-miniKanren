@@ -59,6 +59,7 @@
    (run 10 (q)
      (fresh (ty1 ty2)
        (=/= ty1 ty2)
+       (=/= ty2 `(rcd ,∅))
        (== q `(,ty1 ,ty2))
        (sub ty1 ty2)
        (typ ty1)
