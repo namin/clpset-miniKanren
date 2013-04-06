@@ -11,14 +11,12 @@
 
 (test-check "sub-empty-x-is-empty"
   (run* (q)
-    (sub `(rcd ,∅) q)
-    (typ q))
+    (sub `(rcd ,∅) q))
   '((rcd ∅)))
 
 (test-check "sub-rcd-empty-x-is-empty"
   (run* (q)
-    (sub-rcd ∅ q)
-    (typ-rcd q))
+    (sub-rcd ∅ q))
   '(∅))
 
 (test-check "sub-1-x-is"

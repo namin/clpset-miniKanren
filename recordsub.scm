@@ -45,8 +45,7 @@
   (lambda (ty1 ty2)
     (conde
       ((== ty1 ty2)
-       ;;;(typ ty1)
-       )
+       (typ ty1))
       ((=/= ty1 ty2)
        (fresh (r1 r2)
          (== `(rcd ,r1) ty1)
@@ -61,8 +60,7 @@
       (labelso r2 ls2)
       (conde
         ((== r2 ∅)
-         ;;;(typ-rcd r1)
-        )
+         (typ-rcd r1))
         ((fresh (l ty1 rr1 ty2 rr2)
            (== r1 (set rr1 `(,l ,ty1)))
            (== r2 (set rr2 `(,l ,ty2)))
@@ -78,7 +76,5 @@
        (=/= ty1 ty2)
        (=/= ty2 `(rcd ,∅))
        (== q `(,ty1 ,ty2))
-       (sub ty1 ty2)
-       (typ ty1)
-       (typ ty2)))
+       (sub ty1 ty2)))
  )
