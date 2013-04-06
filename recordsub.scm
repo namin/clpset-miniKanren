@@ -2,9 +2,15 @@
 
 (define typ
   (lambda (ty)
-    (fresh (r)
-      (== `(rcd ,r) ty)
-      (typ-rcd r))))
+    (conde
+      ((== 'top ty))
+      ((fresh (ty1 ty2)
+         (== `(arr ,ty1 ,ty2) ty)
+         (typ ty1)
+         (typ ty2)))
+      ((fresh (r)
+         (== `(rcd ,r) ty)
+         (typ-rcd r))))))
 
 (define typ-rcd
   (lambda (r)
@@ -41,16 +47,25 @@
          (!ino `(,l ,ty) rr)
          (!ino l lsr)
          (labelso rr lsr))))))
+
 (define sub
   (lambda (ty1 ty2)
     (conde
       ((== ty1 ty2)
        (typ ty1))
       ((=/= ty1 ty2)
-       (fresh (r1 r2)
-         (== `(rcd ,r1) ty1)
-         (== `(rcd ,r2) ty2)
-         (sub-rcd r1 r2))))))
+       (conde
+         ((== 'top ty2)
+          (typ ty1))
+         ((fresh (tya1 tyb1 tya2 tyb2)
+            (== `(arr ,tya1 ,tyb1) ty1)
+            (== `(arr ,tya2 ,tyb2) ty2)
+            (sub tya2 tya1)
+            (sub tyb1 tyb2)))
+         ((fresh (r1 r2)
+            (== `(rcd ,r1) ty1)
+            (== `(rcd ,r2) ty2)
+            (sub-rcd r1 r2))))))))
 
 (define sub-rcd
   (lambda (r1 r2)

@@ -538,9 +538,14 @@
                (conde
                  ((ino n u) (!ino n v))
                  ((ino n v) (!ino n u))))))
-          ((or ;; case seems to be missing from Fig. 5 (?)
-             (and (non-empty-set? u) (empty-set? v))
-             (and (non-empty-set? v) (empty-set? u)))
+          ((and ;; cases seem to be missing from Fig. 5 (?)
+             (not (var? u))
+             (not (var? v))
+             (or
+               (not (eq? (empty-set? u) (empty-set? v)))
+               (not (eq? (non-empty-set? u) (non-empty-set? v)))
+               (not (eq? (atom? u) (atom? v)))
+               (not (eq? (pair? u) (pair? v)))))
             s)
           ;; NOTE handling cases (6) and (7) of uniono (Fig. 7)
           ((and (var? u)
