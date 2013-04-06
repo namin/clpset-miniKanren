@@ -52,6 +52,14 @@
   (run* (q) (tc `(new ,(set ∅ `(foo (lambda (x) x)))) ∅ q))
   '((rcd (set ∅ (foo (arr _.0 _.0))))))
 
+(test-check "tc-new-2"
+  (car (run* (q) (tc `(new ,(set ∅ `(foo (lambda (x) x)) `(bar (lambda (x) x)))) ∅ q)))
+  '(rcd (set ∅ (bar (arr _.0 _.0)) (foo (arr _.1 _.1)))))
+
+(test-check "tc-rcd-2"
+  (car (run* (q) (tc-rcd (set ∅ `(foo (lambda (x) x)) `(bar (lambda (x) x))) ∅ q)))
+  '(set ∅ (bar (arr _.0 _.0)) (foo (arr _.1 _.1))))
+
 (test-check "tc-sel-1"
   (run* (q) (tc `(sel (new ,(set ∅ `(foo (lambda (x) x)))) foo) ∅ q))
   '((arr _.0 _.0)))
