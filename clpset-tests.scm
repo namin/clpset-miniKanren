@@ -130,6 +130,18 @@
      (!in (_.1 _.0) (_.1 _.2) (_.1 _.3))
      (union [_.0 _.2 _.3]))))
 
+(test-check
+ "intersectiono-related"
+ (run* (q)
+   (fresh (x y z)
+     (uniono x z (set ∅ 1))
+     (uniono y z (set ∅ 1))
+     (disjo x y)
+     (== q `(,x ,y ,z))))
+ '((∅ ∅ (set ∅ 1))
+   ((set ∅ 1) ∅ (set ∅ 1))
+   (∅ (set ∅ 1) (set ∅ 1))))
+
 ;;; problematic (?) tests, reproduced in {log} too
 
 (test-check "redundant-answers-=/=-pair-case-1"
