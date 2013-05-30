@@ -51,3 +51,57 @@
  (length (run* (q) (cartesiano (set ∅ 'a 'b) (set ∅ 1 2) q)))
  128)
 
+;; 3.2.3 of TAPL
+(define S
+  (lambda (i s)
+    (conde
+     ((== i 'z) (== s ∅))
+     ((fresh (i-1 S-1 S-11 S-111 S-succ S-pred S-iszero S-if s1 s2 s3)
+         (== i `(s ,i-1))
+         (S i-1 S-1)
+         (map-seto (lambda (e o) (== o `(succ ,e))) S-1 S-succ)
+         (map-seto (lambda (e o) (== o `(pred ,e))) S-1 S-pred)
+         (map-seto (lambda (e o) (== o `(iszero ,e))) S-1 S-iszero)
+         (cartesiano S-1 S-1 S-11)
+         (cartesiano S-1 S-11 S-111)
+         (map-seto (lambda (e o) (fresh (e1 e2 e3)
+                               (== e `(,e1 (,e2 ,e3)))
+                               (== o `(if ,e1 ,e2 ,e3)))) S-111 S-if)
+         (uniono (set ∅ 'true 'false 'zero) S-succ s1)
+         (uniono s1 S-pred s2)
+         (uniono s2 S-iszero s3)
+         (uniono s3 S-if s))))))
+
+(define mini-S
+  (lambda (i s)
+    (conde
+     ((== i 'z) (== s ∅))
+     ((fresh (i-1 S-1 S-11 S-succ S-plus s1)
+         (== i `(s ,i-1))
+         (mini-S i-1 S-1)
+         (map-seto (lambda (e o) (== o `(succ ,e))) S-1 S-succ)
+         (cartesiano S-1 S-1 S-11)
+         (map-seto (lambda (e o) (fresh (e1 e2)
+                               (== e `(,e1 ,e2))
+                               (== o `(plus ,e1 ,e2)))) S-11 S-plus)
+         (uniono (set ∅ 'true 'false 'zero) S-succ s1)
+         (uniono s1 S-plus s))))))
+
+(test-check
+ "S0"
+ (run 1 (q) (S 'z q))
+ '(∅))
+
+(test-check
+ "S1"
+ (run 1 (q) (S '(s z) q))
+ '((set ∅ false true zero)))
+
+(test-check
+ "mini-S2"
+ (run 1 (q) (mini-S '(s (s z)) q))
+ '((set ∅
+    (plus false false) (plus false true) (plus false zero)
+    (plus true false) (plus true true) (plus true zero)
+    (plus zero false) (plus zero true) (plus zero zero)
+    (succ false) (succ true) (succ zero) false true zero)))
