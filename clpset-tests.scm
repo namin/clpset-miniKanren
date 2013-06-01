@@ -27,6 +27,10 @@
   (run* (q) (fresh (z) (== q (set q (set z 1)))))
   '(((set _.0 (set _.1 1)) : (set  _.0 _.1))))
 
+(test-check "set-run-eq-5"
+  (run* (q) (== (set q 2) (set q 1)))
+  '(((set _.0 1 2) : (set _.0))))
+
 (test-check "set-run-ino-1"
   (run* (q) (fresh (x y z) (== q `(,x ,y ,z)) (ino 'a (set z x 'b y))))
   '(((a _.0 _.1) : (set _.1))

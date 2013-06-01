@@ -73,7 +73,7 @@
     (cond
       ((empty-set? x) #f)
       ((non-empty-set? x) (vector-ref x 0))
-      ((var? x) t))))
+      ((var? x) x))))
 (define with-set-tail
   (lambda (t x)
     (cond
