@@ -410,7 +410,7 @@
     (let ((u (walk ou s))
           (v (walk ov s)))
       (cond
-        ((and (var? v) (not (var? u))) (unify ov ou s))
+        ((and (var? v) (not (var? u))) (unify v u s))
         ((eq? u v) s)
         ((and (var? u) (not (occurs-check u v s))) (ext-s u v s))
         ((and (pair? u) (pair? v))
@@ -505,7 +505,7 @@
             (v (walk ov s)))
         (cond
           ((and (var? v) (not (var? u)))
-           (bind s (=/= ov ou)))
+           (bind s (=/= v u)))
           ((and (pair? u) (pair? v))
             (bind s
               (conde
