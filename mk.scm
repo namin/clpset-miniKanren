@@ -262,7 +262,7 @@
     (let* ((v (walk* v s))
            (r (reify-s v empty-s))
            (vr (walk* v r))
-           (Cr (filter (lambda (id) id) (reify-constraints s r))))
+           (Cr (reify-constraints s r)))
       (normalize-all-reified-sets
         (if (null? Cr)
           vr
