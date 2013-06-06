@@ -199,13 +199,13 @@
   empty-set)
 
 (test-check "normalize-set-2"
-  (normalize-set `#(,empty-set 1 2) '() empty-s)
-  `#(,empty-set 1 2))
+  (normalize-set (set empty-set 1 2) '() empty-s)
+  (set empty-set 1 2))
 
 (test-check "normalize-set-3"
-  (normalize-set `#(#(,empty-set 1) 2) '() empty-s)
-  `#(,empty-set 1 2))
+  (normalize-set (set (set empty-set 1) 2) '() empty-s)
+  (set empty-set 1 2))
 
 (test-check "normalize-set-4"
-  (normalize-set `#(#(,(var 'x) 1) 2) '() empty-s)
-  `#(,(var 'x) 1 2))
+  (normalize-set (set (set (var 'x) 1) 2) '() empty-s)
+  (set (var 'x) 1 2))

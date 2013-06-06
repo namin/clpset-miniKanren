@@ -51,61 +51,45 @@
 
 (define empty-set '#())
 (define ∅ empty-set)
-(define set
-  (lambda (base e0 . elems)
-    `#(,base ,e0 ,@elems)))
+(define make-set (lambda (base mems) `#(,base ,mems)))
+(define set-map vector-map)
+(define set-base (lambda (x) (vector-ref x 0)))
+(define set-mems (lambda (x) (vector-ref x 1)))
+(define set (lambda (base e0 . es) (make-set base (cons e0 es))))
 (define empty-set? (lambda (x) (and (vector? x) (= (vector-length x) 0))))
-(define non-empty-set? (lambda (x) (and (vector? x) (> (vector-length x) 1))))
+(define non-empty-set? (lambda (x) (and (vector? x) (= (vector-length x) 2))))
 (define set? (lambda (x) (or (empty-set? x) (non-empty-set? x))))
 (define normalize-set
   (lambda (x es s)
     (cond
-      ((empty-set? x) (if (null? es) empty-set `#(,empty-set ,@es)))
-      ((non-empty-set? x) (let ((v (vector->list x)))
-                            (normalize-set
-                              (walk (car v) s)
-                              (append (cdr v) es)
-                              s)))
-      ((and (var? x) (not (null? es))) `#(,x ,@es))
-      ((and (symbol? x) (not (null? es))) `#(,x ,@es)))))
+      ((empty-set? x) (if (null? es) empty-set (make-set empty-set es)))
+      ((non-empty-set? x)
+       (normalize-set (walk (set-base x) s)
+                      (append (set-mems x) es)
+                      s))
+      ((and (var? x) (not (null? es))) (make-set x es))
+      ((and (symbol? x) (not (null? es))) (make-set x es)))))
 (define set-tail
   (lambda (x)
     (cond
       ((empty-set? x) #f)
-      ((non-empty-set? x) (vector-ref x 0))
+      ((non-empty-set? x) (set-base x))
       ((var? x) x))))
 (define with-set-tail
   (lambda (t x)
     (cond
-      ((non-empty-set? x)
-       (let ((v (vector->list x)))
-         `#(,t ,@(cdr v))))
+      ((non-empty-set? x) (make-set t (set-mems x)))
       ((var? x) t))))
 (define non-empty-set-first
-  (lambda (x)
-    (vector-ref x 1)))
+  (lambda (x) (car (set-mems x))))
 (define non-empty-set-rest
   (lambda (x)
-    (if (= 2 (vector-length x))
-      (vector-ref x 0)
-      (let ((v (vector->list x)))
-        `#(,(car v) ,@(cddr v))))))
-(define (rem-index i lst)
-  (if (= i 0)
-    (cdr lst)
-    (cons (car lst) (rem-index (- i 1) (cdr lst)))))
-(define non-empty-set-at
-  (lambda (j x)
-    (vector-ref x (+ j 1))))
-(define non-empty-set-except-at
-  (lambda (j x)
-    (let ((r (rem-index (+ 1 j) (vector->list x))))
-      (if (null? (cdr r))
-        (car r)
-        `#(,@r)))))
-(define non-empty-set-size
-  (lambda (x)
-    (- (vector-length x) 1)))
+    (let ((rest-mems (cdr (set-mems x))))
+      (if (null? rest-mems)
+          (set-base x)
+          (make-set (set-base x) rest-mems)))))
+(define set->list (lambda (x) (cons (set-base x) (set-mems x))))
+(define list->set (lambda (x) (make-set (car x) (cdr x))))
 (define check-constraints
   (lambda (C->c with-C-c apply-c)
     (lambda (s)
@@ -124,7 +108,7 @@
          (tree-collect predicate (cdr tree)
            (tree-collect predicate (car tree) acc)))
         ((non-empty-set? tree)
-         (tree-collect predicate (vector->list tree) acc))
+         (tree-collect predicate (set->list tree) acc))
         (else acc)))))
 (define infer-sets
   (lambda (vs)
@@ -173,7 +157,7 @@
            (occurs-check x (car v) s)
            (occurs-check x (cdr v) s)))
         ((non-empty-set? v)
-          (occurs-check x (vector->list v) s))
+          (occurs-check x (set->list v) s))
         (else #f)))))
 
 (define walk*
@@ -186,8 +170,8 @@
            (walk* (car v) s)
            (walk* (cdr v) s)))
         ((non-empty-set? v)
-          (let ((ns (normalize-set v '()  s)))
-            `#(,@(walk* (vector->list ns) s))))
+         (let ((ns (normalize-set v '()  s)))
+           (list->set (walk* (set->list ns) s))))
         (else v)))))
 
 (define reify-s
@@ -199,7 +183,7 @@
         ((pair? v) (reify-s (cdr v)
                      (reify-s (car v) s)))
         ((non-empty-set? v)
-         (reify-s (vector->list v) s))
+         (reify-s (set->list v) s))
         (else s)))))
 
 (define reify-name
@@ -249,9 +233,9 @@
     (cond
       ((empty-set? x) '∅)
       ((non-empty-set? x)
-       (let ((v (map normalize-all-reified-sets (vector->list x))))
-         (let ((v (vector->list (normalize-set (car v) (cdr v) empty-s))))
-           `(set ,(car v) ,@(reified-sort (cdr v))))))
+       (let ((v (set-map normalize-all-reified-sets x)))
+         (let ((v (normalize-set (set-base v) (set-mems v) empty-s)))
+           `(set ,(set-base v) ,@(reified-sort (set-mems v))))))
       ((pair? x)
        (cons
          (normalize-all-reified-sets (car x))
@@ -423,7 +407,7 @@
                  (x (set-tail vns)))
             (cond
               ((and (var? u) (eq? x u)
-                 (not (occurs-check u (cdr (vector->list vns)) s)))
+                    (not (occurs-check u (set-mems vns) s)))
                 (bind s
                   (fresh (n)
                     (== u (with-set-tail n vns))
@@ -441,27 +425,31 @@
                          ((== tu tv) (== uns rv))
                          ((== tu tv) (== ru vns))
                          ((fresh (n)
-                            (== ru `#(,n ,tv))
-                            (== `#(,n ,tu) rv)
+                            (== ru (set n tv))
+                            (== (set n tu) rv)
                             (seto n))))))
                    ((let ((t0 (non-empty-set-first uns))
-                          (ru (non-empty-set-rest uns))
-                          (maxj (non-empty-set-size vns)))
+                          (ru (non-empty-set-rest uns)))
                       (bind s
-                        (let loopj ((j 0))
-                          (if (< j maxj)
-                            (let ((tj (non-empty-set-at j vns))
-                                  (rj (non-empty-set-except-at j vns)))
-                              (conde
-                                ((== t0 tj) (== ru rj) (seto ru))
-                                ((== t0 tj) (== uns rj))
-                                ((== t0 tj) (== ru vns))
-                                ((fresh (n)
-                                   (== x `#(,n ,t0))
-                                   (== (with-set-tail n ru) (with-set-tail n vns))
-                                   (seto n)))
-                                ((loopj (+ j 1)))))
-                            fail))))))))
+                        (let ((b (set-base vns)))
+                          (let loopj ((j (set-mems vns))
+                                      (acc '()))
+                            (if (null? j)
+                                fail
+                                (let ((cj (cdr j)))
+                                  (let ((tj (car j))
+                                        (rj (if (and (null? acc) (null? cj))
+                                                b
+                                                (make-set b (append acc cj)))))
+                                    (conde
+                                     ((== t0 tj) (== ru rj) (seto ru))
+                                     ((== t0 tj) (== uns rj))
+                                     ((== t0 tj) (== ru vns))
+                                     ((fresh (n)
+                                             (== x (set n t0))
+                                             (== (with-set-tail n ru) (with-set-tail n vns))
+                                             (seto n)))
+                                     ((loopj cj (cons tj acc)))))))))))))))
               (else #f))))
         ((equal? u v) s)
         (else #f)))))
@@ -490,7 +478,7 @@
               ((var? x)
                 (bind s
                   (fresh (n)
-                    (== x `#(,n ,t))
+                    (== x (set n t))
                     (seto n))))
               (else #f))))))))
 
@@ -519,11 +507,11 @@
           ((and (var? u) (occurs-check u v s))
            (if (non-empty-set? v)
              (let* ((vns (normalize-set v '() s))
-                    (vts (cdr (vector->list vns))))
+                    (vts (set-mems vns)))
                (if (occurs-check u vts s)
                  s
                  (begin
-                   (assert (eq? u (vector-ref vns 0)))
+                   (assert (eq? u (set-base vns)))
                    (bind s
                      (let loop ((vts vts))
                        (if (null? vts)
@@ -603,21 +591,21 @@
                (let ((tz (non-empty-set-first z)))
                  (bind s
                    (fresh (n)
-                    (== z `#(,n ,tz))
+                    (== z (set n tz))
                     (!ino tz n)
                     (conde
                       ((fresh (n1)
-                         (== x `#(,n1 ,tz))
+                         (== x (set n1 tz))
                          (!ino tz n1)
                          (uniono n1 y n)))
                       ((fresh (n1)
-                         (== y `#(,n1 ,tz))
+                         (== y (set n1 tz))
                          (!ino tz n1)
                          (uniono x n1 n)))
                       ((fresh (n1 n2)
-                         (== x `#(,n1 ,tz))
+                         (== x (set n1 tz))
                          (!ino tz n1)
-                         (== y `#(,n2 ,tz))
+                         (== y (set n2 tz))
                          (!ino tz n2)
                          (uniono n1 n2 n))))))))
               ((or (non-empty-set? x) (non-empty-set? y))
@@ -625,14 +613,14 @@
                  (let ((tx (non-empty-set-first x)))
                    (bind s
                      (fresh (n n1)
-                       (== x `#(,n1 ,tx))
+                       (== x (set n1 tx))
                        (!ino tx n1)
-                       (== z `#(,n ,tx))
+                       (== z (set n tx))
                        (!ino tx n)
                        (conde
                          ((!ino tx y) (uniono n1 y n))
                          ((fresh (n2)
-                            (== y `#(,n2 ,tx))
+                            (== y (set n2 tx))
                             (!ino tx n2)
                             (uniono n1 n2 n)))))))))
               ;; NOTE cases (6) and (7) in Fig. 7 are handled in =/=
