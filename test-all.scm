@@ -1,0 +1,5 @@
+(load "mktests.scm")
+(load "clpset-tests.scm")
+(load "lib-tests.scm")
+(load "recordsub-tests.scm")
+(load "tapl.scm")
