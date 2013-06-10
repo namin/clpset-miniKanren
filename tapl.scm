@@ -3,7 +3,7 @@
 
 (define map-seto
   (lambda (fo s out)
-    (conde
+    (condo
      ((== s ∅)
       (== out ∅))
      ((fresh (se sr oe or)
@@ -31,7 +31,7 @@
 
 (define cartesiano
   (lambda (a b out)
-    (conde
+    (condo
      ((== a ∅)
       (== out ∅))
      ((fresh (ae ar o1 or)
@@ -54,7 +54,7 @@
 ;; 3.2.3 of TAPL
 (define S
   (lambda (i s)
-    (conde
+    (condo
      ((== i 'z) (== s ∅))
      ((fresh (i-1 S-1 S-11 S-111 S-succ S-pred S-iszero S-if s1 s2 s3)
          (== i `(s ,i-1))
@@ -74,7 +74,7 @@
 
 (define mini-S
   (lambda (i s)
-    (conde
+    (condo
      ((== i 'z) (== s ∅))
      ((fresh (i-1 S-1 S-11 S-succ S-plus s1)
          (== i `(s ,i-1))

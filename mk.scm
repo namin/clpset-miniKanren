@@ -330,6 +330,14 @@
            (bind* (g0 s) g ...)
            (bind* (g1 s) g^ ...) ...))))))
 
+(define-syntax condo
+  (syntax-rules ()
+    ((_ (g0 g ...) (g1 g^ ...) ...)
+     (lambdag@ (s)
+       (mplus*
+         (bind* (g0 s) g ...)
+         (bind* (g1 s) g^ ...) ...)))))
+
 (define-syntax mplus*
   (syntax-rules ()
     ((_ e) e)
@@ -398,10 +406,8 @@
         ((eq? u v) s)
         ((and (var? u) (not (occurs-check u v s))) (ext-s u v s))
         ((and (pair? u) (pair? v))
-         (let ((s (unify
-                    (car u) (car v) s)))
-           (and s (unify
-                    (cdr u) (cdr v) s))))
+         (bind (unify (car u) (car v) s)
+               (lambda (s) (unify (cdr u) (cdr v) s))))
         ((non-empty-set? v)
           (let* ((vns (normalize-set v '() s))
                  (x (set-tail vns)))
@@ -420,7 +426,7 @@
                          (tv (non-empty-set-first vns))
                          (rv (non-empty-set-rest vns)))
                      (bind s
-                       (conde
+                       (condo
                          ((== tu tv) (== ru rv) (seto ru))
                          ((== tu tv) (== uns rv))
                          ((== tu tv) (== ru vns))
@@ -441,7 +447,7 @@
                                         (rj (if (and (null? acc) (null? cj))
                                                 b
                                                 (make-set b (append acc cj)))))
-                                    (conde
+                                    (conde ;;; not changed, b/c test sub-reflexivity-1 then fails
                                      ((== t0 tj) (== ru rj) (seto ru))
                                      ((== t0 tj) (== uns rj))
                                      ((== t0 tj) (== ru vns))
@@ -472,7 +478,7 @@
                 (let ((tx (non-empty-set-first x))
                       (rx (non-empty-set-rest x)))
                   (bind s
-                    (conde
+                    (condo
                       ((== tx t))
                       ((ino t rx))))))
               ((var? x)
@@ -496,7 +502,7 @@
            (bind s (=/= v u)))
           ((and (pair? u) (pair? v))
             (bind s
-              (conde
+              (condo
                 ((=/= (car u) (car v)))
                 ((=/= (cdr u) (cdr v))))))
           ((eq? u v) #f)
@@ -516,14 +522,14 @@
                      (let loop ((vts vts))
                        (if (null? vts)
                          fail
-                         (conde
+                         (condo
                            ((!ino (car vts) u))
                            ((loop (cdr vts))))))))))
              s))
           ((and (non-empty-set? u) (non-empty-set? v))
            (bind s
              (fresh (n)
-               (conde
+               (condo
                  ((ino n u) (!ino n v))
                  ((ino n v) (!ino n u))))))
           ((and ;; cases seem to be missing from Fig. 5 (?)
@@ -545,7 +551,7 @@
                (C->union (s->C s))))
             (bind s
               (fresh (n)
-                (conde
+                (condo
                   ((ino n u) (!ino n v))
                   ((ino n v) (!ino n u))
                   ((== u empty-set) (=/= v empty-set))))))
@@ -593,7 +599,7 @@
                    (fresh (n)
                     (== z (set n tz))
                     (!ino tz n)
-                    (conde
+                    (condo
                       ((fresh (n1)
                          (== x (set n1 tz))
                          (!ino tz n1)
@@ -617,7 +623,7 @@
                        (!ino tx n1)
                        (== z (set n tx))
                        (!ino tx n)
-                       (conde
+                       (condo
                          ((!ino tx y) (uniono n1 y n))
                          ((fresh (n2)
                             (== y (set n2 tx))
@@ -673,7 +679,7 @@
                 (z (walk z s)))
             (bind s
               (fresh (n)
-                (conde
+                (condo
                   ((ino n z) (!ino n x) (!ino n y))
                   ((ino n x) (!ino n z))
                   ((ino n y) (!ino n z)))))))))))
