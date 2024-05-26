@@ -209,3 +209,33 @@
 (test-check "normalize-set-4"
   (normalize-set (set (set (var 'x) 1) 2) '() empty-s)
   (set (var 'x) 1 2))
+
+
+;; Will Byrd's test to ensure `unify` correctly handles pairs of sets
+;; containing variables (in other words, in the case that there is
+;; non-determinism).
+(test-check "unify-pairs-of-sets-duplicates"
+  (run* (q)
+    (fresh (a b c d e f g h s1 s2 s3 s4)
+      (== (list s1 s2 s3 s4) q)
+      (== (set a b) s1)
+      (== (set c d) s2)
+      (== (set e f) s3)
+      (== (set g h) s4)      
+      (== (cons s1 s2) (cons s3 s4))))
+  '((((set _.0 _.1) (set _.2 _.3) (set _.0 _.1) (set _.2 _.3)) : (set _.0 _.2))
+    (((set _.0 _.1) (set _.2 _.3) (set _.0 _.1) (set _.2 _.3)) : (set _.0 _.2))
+    (((set _.0 _.1) (set _.2 _.3) (set _.0 _.1) (set _.2 _.3)) : (set _.0 _.2))
+    (((set _.0 _.1) (set _.2 _.3) (set _.0 _.1) (set _.2 _.3)) : (set _.0 _.2))
+    (((set _.0 _.1) (set _.2 _.3) (set _.0 _.1) (set _.2 _.3)) : (set _.0 _.2))
+    (((set _.0 _.1) (set _.2 _.3 _.4) (set _.0 _.1) (set _.2 _.3 _.4)) : (set _.0 _.2))
+    (((set _.0 _.1) (set _.2 _.3) (set _.0 _.1) (set _.2 _.3)) : (set _.0 _.2))
+    (((set _.0 _.1) (set _.2 _.3) (set _.0 _.1) (set _.2 _.3)) : (set _.0 _.2))
+    (((set _.0 _.1) (set _.2 _.3) (set _.0 _.1) (set _.2 _.3)) : (set _.0 _.2))
+    (((set _.0 _.1) (set _.2 _.3 _.4) (set _.0 _.1) (set _.2 _.3 _.4)) : (set _.0 _.2))
+    (((set _.0 _.1 _.2) (set _.3 _.4) (set _.0 _.1 _.2) (set _.3 _.4)) : (set _.0 _.3))
+    (((set _.0 _.1) (set _.2 _.3) (set _.0 _.1) (set _.2 _.3)) : (set _.0 _.2))
+    (((set _.0 _.1 _.2) (set _.3 _.4) (set _.0 _.1 _.2) (set _.3 _.4)) : (set _.0 _.3))
+    (((set _.0 _.1 _.2) (set _.3 _.4) (set _.0 _.1 _.2) (set _.3 _.4)) : (set _.0 _.3))
+    (((set _.0 _.1) (set _.2 _.3 _.4) (set _.0 _.1) (set _.2 _.3 _.4)) : (set _.0 _.2))
+    (((set _.0 _.1 _.2) (set _.3 _.4 _.5) (set _.0 _.1 _.2) (set _.3 _.4 _.5)) : (set _.0 _.3))))

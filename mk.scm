@@ -400,8 +400,7 @@
         ((and (pair? u) (pair? v))
          (let ((s (unify
                     (car u) (car v) s)))
-           (and s (unify
-                    (cdr u) (cdr v) s))))
+           (bind s (== (cdr u) (cdr v)))))
         ((non-empty-set? v)
           (let* ((vns (normalize-set v '() s))
                  (x (set-tail vns)))
