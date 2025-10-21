@@ -10,3 +10,5 @@ The prototype is feature-complete wrt to the paper.
 I also double-check the [CLP(Set) tests](clpset-tests.scm) by running
 them in [`{log}`](http://people.dmi.unipr.it/gianfranco.rossi/setlog.Home.html),
 a CLP(Set) implementation in Prolog.
+
+See also [rvs314/faster-clpset-minikanren](https://github.com/rvs314/faster-clpset-minikanren).
